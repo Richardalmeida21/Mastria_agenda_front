@@ -14,8 +14,9 @@
     "vite": "^4.0.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite preview"
-  }
+  "dev": "vite",
+  "build": "vite build",
+  "start": "vite preview",
+  "deploy": "npm run build && vercel --prod"
+}
 }
