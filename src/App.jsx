@@ -1,17 +1,29 @@
-import { Link, Outlet } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Agendamentos from "./pages/Agendamentos";
+import Clientes from "./pages/Clientes";
+import Profissionais from "./pages/Profissionais";
 
-export default function Dashboard({ user }) {
-  if (!user) return <div>Acesso negado</div>;
+function App() {
+  const [user, setUser] = useState({ name: "Usuário Teste" }); // Simula um login
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <nav className="mt-4 space-x-4">
-        <Link to="agendamentos" className="text-blue-500">Agendamentos</Link>
-        <Link to="clientes" className="text-blue-500">Clientes</Link>
-        <Link to="profissionais" className="text-blue-500">Profissionais</Link>
-      </nav>
-      <Outlet /> {/* Isso garante que as páginas internas apareçam */}
-    </div>
+    <Router>
+      <Routes>
+        {/* Página de Login */}
+        <Route path="/" element={<Login setUser={setUser} />} />
+
+        {/* Dashboard com subpáginas */}
+        <Route path="/dashboard" element={<Dashboard user={user} />}>
+          <Route path="agendamentos" element={<Agendamentos />} />
+          <Route path="clientes" element={<Clientes />} />
+          <Route path="profissionais" element={<Profissionais />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
+
+export default App;
