@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -30,6 +29,7 @@ export default function Login() {
         setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
+      console.error("Erro de login:", err);  // Log do erro completo
       setError("Login falhou. Verifique suas credenciais.");
     }
   };
