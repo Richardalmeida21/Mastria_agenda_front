@@ -16,14 +16,18 @@ export default function Login() {
         username,
         senha,
       });
-      
+
       console.log("Resposta da API:", response.data); // Exibir a resposta da API
-      
-      if (response.data && response.data.token) {
-        localStorage.setItem("token", response.data.token);
+
+      // Extraindo o token corretamente
+      const token = response.data.token || response.data["token"];
+      console.log("Token recebido:", token);
+
+      if (token) {
+        localStorage.setItem("token", token);
         navigate("/dashboard");
       } else {
-        setError("Erro: Token não recebido.");
+        setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
       setError("Login falhou. Verifique suas credenciais.");
