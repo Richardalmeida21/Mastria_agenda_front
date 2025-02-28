@@ -8,12 +8,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Resetando erro antes de uma nova tentativa
-    setError(null);
-
     try {
-      // Enviando dados para o backend
       const response = await axios.post("https://mastriaagenda-production.up.railway.app/login", {
         username,
         senha,
@@ -21,28 +16,25 @@ export default function Login() {
 
       console.log("Resposta da API:", response.data); // Exibe a resposta da API
 
-      // Verificando se o token foi retornado corretamente
-      const token = response?.data?.token;
+      // Extraindo o token corretamente
+      const token = response.data.token || response.data["token"];
       console.log("Token recebido:", token);
 
       if (token) {
-        localStorage.setItem("token", token);  // Armazenando o token no localStorage
-
-        // Validando o token fazendo uma requisição protegida (por exemplo)
+        localStorage.setItem("token", token);
+        // Agora, ao fazer uma requisição subsequente, você precisa enviar o token
         const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/protected-endpoint", {
           headers: {
-            Authorization: `Bearer ${token}`, // Enviando o token no cabeçalho
-          },
+            Authorization: `Bearer ${token}` // Enviando o token no cabeçalho de autorização
+          }
         });
         console.log("Resposta do endpoint protegido:", userResponse.data);
-
-        // Redirecionamento ou outra ação após o login bem-sucedido
-        // Exemplo: Navegar para outra página ou mostrar uma mensagem de sucesso
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
-      console.error("Erro durante login", err);
+      // Aqui estamos inspecionando o erro e exibindo as informações detalhadas
+      console.log("Erro durante login:", err.response);  // Exibe detalhes do erro
       setError("Login falhou. Verifique suas credenciais.");
     }
   };
@@ -65,7 +57,7 @@ export default function Login() {
           onChange={(e) => setSenha(e.target.value)}
           className="border p-2 rounded w-full"
         />
-        {error && <p className="text-red-500">{error}</p>} {/* Exibindo erro se houver */}
+        {error && <p className="text-red-500">{error}</p>}
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
           Entrar
         </button>
