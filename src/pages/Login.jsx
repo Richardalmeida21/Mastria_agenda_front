@@ -16,8 +16,15 @@ export default function Login() {
         username,
         senha,
       });
-      localStorage.setItem("token", response.data.token);
-      navigate("/dashboard");
+      
+      console.log("Resposta da API:", response.data); // Exibir a resposta da API
+      
+      if (response.data && response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/dashboard");
+      } else {
+        setError("Erro: Token não recebido.");
+      }
     } catch (err) {
       setError("Login falhou. Verifique suas credenciais.");
     }
