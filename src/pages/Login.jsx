@@ -24,12 +24,11 @@ export default function Login() {
 
       if (token) {
         localStorage.setItem("token", token);
-        navigate("/dashboard");
+        navigate("/dashboard");  // Navegar para a página desejada após o login
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
-      console.error("Erro de login:", err);  // Log do erro completo
       setError("Login falhou. Verifique suas credenciais.");
     }
   };
