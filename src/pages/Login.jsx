@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,7 +22,13 @@ export default function Login() {
 
       if (token) {
         localStorage.setItem("token", token);
-        navigate("/dashboard");  // Navegar para a página desejada após o login
+        // Agora, ao fazer uma requisição subsequente, você precisa enviar o token
+        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/protected-endpoint", {
+          headers: {
+            Authorization: `Bearer ${token}` // Enviando o token no cabeçalho de autorização
+          }
+        });
+        console.log("Resposta do endpoint protegido:", userResponse.data);
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
