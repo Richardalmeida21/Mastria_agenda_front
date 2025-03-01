@@ -1,4 +1,3 @@
-// src/pages/Clientes.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -15,7 +14,7 @@ export default function Clientes() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setClientes(response.data);
     } catch (err) {
@@ -28,7 +27,7 @@ export default function Clientes() {
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/cliente", novoCliente, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setNovoCliente({ nome: "", email: "", telefone: "" });
       buscarClientes();
@@ -41,7 +40,7 @@ export default function Clientes() {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       buscarClientes();
     } catch (err) {
@@ -55,26 +54,26 @@ export default function Clientes() {
       {error && <p className="text-red-500">{error}</p>}
 
       <form onSubmit={criarCliente} className="mt-4 space-y-4">
-        <input 
-          type="text" 
-          placeholder="Nome" 
-          value={novoCliente.nome} 
-          onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })} 
-          className="border p-2 rounded w-full" 
+        <input
+          type="text"
+          placeholder="Nome"
+          value={novoCliente.nome}
+          onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
+          className="border p-2 rounded w-full"
         />
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={novoCliente.email} 
-          onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })} 
-          className="border p-2 rounded w-full" 
+        <input
+          type="email"
+          placeholder="Email"
+          value={novoCliente.email}
+          onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
+          className="border p-2 rounded w-full"
         />
-        <input 
-          type="text" 
-          placeholder="Telefone" 
-          value={novoCliente.telefone} 
-          onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })} 
-          className="border p-2 rounded w-full" 
+        <input
+          type="text"
+          placeholder="Telefone"
+          value={novoCliente.telefone}
+          onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
+          className="border p-2 rounded w-full"
         />
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Cliente</button>
       </form>
