@@ -1,20 +1,23 @@
-// src/pages/Agendamentos.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Agendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
   const [novoAgendamento, setNovoAgendamento] = useState({
-    cliente: "",
-    profissional: "",
+    clienteId: "",
+    profissionalId: "",
     servico: "MANICURE",
     data: "",
     hora: ""
   });
+  const [clientes, setClientes] = useState([]);
+  const [profissionais, setProfissionais] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     buscarAgendamentos();
+    buscarClientes();
+    buscarProfissionais();
   }, []);
 
   const buscarAgendamentos = async () => {
@@ -29,16 +32,50 @@ export default function Agendamentos() {
     }
   };
 
+  const buscarClientes = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setClientes(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar clientes:", err);
+    }
+  };
+
+  const buscarProfissionais = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfissionais(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar profissionais:", err);
+    }
+  };
+
   const criarAgendamento = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, {
+      const payload = {
+        clienteId: novoAgendamento.clienteId,
+        profissionalId: novoAgendamento.profissionalId,
+        servico: novoAgendamento.servico,
+        dataHora: `${novoAgendamento.data}T${novoAgendamento.hora}:00`
+      };
+
+      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
       buscarAgendamentos();
     } catch (err) {
-      setError("Erro ao criar agendamento.");
+      console.error("Erro ao criar agendamento:", err.response);
+      setError("Erro ao criar agendamento. Verifique os dados.");
     }
   };
 
@@ -48,20 +85,28 @@ export default function Agendamentos() {
       {error && <p className="text-red-500">{error}</p>}
 
       <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
-        <input 
-          type="text" 
-          placeholder="Cliente" 
-          value={novoAgendamento.cliente} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, cliente: e.target.value })} 
-          className="border p-2 rounded w-full" 
-        />
-        <input 
-          type="text" 
-          placeholder="Profissional" 
-          value={novoAgendamento.profissional} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissional: e.target.value })} 
-          className="border p-2 rounded w-full" 
-        />
+        <select 
+          value={novoAgendamento.clienteId} 
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })} 
+          className="border p-2 rounded w-full"
+        >
+          <option value="">Selecione um Cliente</option>
+          {clientes.map(cliente => (
+            <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
+          ))}
+        </select>
+
+        <select 
+          value={novoAgendamento.profissionalId} 
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })} 
+          className="border p-2 rounded w-full"
+        >
+          <option value="">Selecione um Profissional</option>
+          {profissionais.map(profissional => (
+            <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
+          ))}
+        </select>
+
         <select 
           value={novoAgendamento.servico} 
           onChange={(e) => setNovoAgendamento({ ...novoAgendamento, servico: e.target.value })} 
@@ -73,25 +118,28 @@ export default function Agendamentos() {
           <option value="DEPILACAO">Depilação</option>
           <option value="PODOLOGIA">Podologia</option>
         </select>
+
         <input 
           type="date" 
           value={novoAgendamento.data} 
           onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })} 
           className="border p-2 rounded w-full" 
         />
+
         <input 
           type="time" 
           value={novoAgendamento.hora} 
           onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })} 
           className="border p-2 rounded w-full" 
         />
+
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
       </form>
 
       <ul className="mt-4">
         {agendamentos.map((agendamento) => (
           <li key={agendamento.id} className="border-b p-2">
-            {agendamento.cliente.nome} - {agendamento.servico} - {agendamento.data} {agendamento.hora}
+            {agendamento.cliente?.nome} - {agendamento.servico} - {agendamento.dataHora}
           </li>
         ))}
       </ul>
