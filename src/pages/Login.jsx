@@ -1,40 +1,39 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://mastriaagenda-production.up.railway.app/login", {
+      const response = await axios.post("https://mastriaagenda-production.up.railway.app/auth/login", {
         username,
         senha,
       });
 
-      console.log("Resposta da API:", response.data); // Exibe a resposta da API
+      console.log("Resposta da API:", response.data);
 
-      // Extraindo o token corretamente
-      const token = response.data.token || response.data["token"];
-      console.log("Token recebido:", token);
-
+      const token = response.data.token;
       if (token) {
         localStorage.setItem("token", token);
-        // Agora, ao fazer uma requisição subsequente, você precisa enviar o token
-        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/protected-endpoint", {
-          headers: {
-            Authorization: `Bearer ${token}` // Enviando o token no cabeçalho de autorização
-          }
+
+        // Busca informações do usuário autenticado
+        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Resposta do endpoint protegido:", userResponse.data);
+
+        localStorage.setItem("user", JSON.stringify(userResponse.data));
+        navigate("/dashboard");
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
-      // Aqui estamos inspecionando o erro e exibindo as informações detalhadas
-      console.log("Erro durante login:", err.response);  // Exibe detalhes do erro
+      console.log("Erro durante login:", err.response);
       setError("Login falhou. Verifique suas credenciais.");
     }
   };
@@ -43,17 +42,17 @@ export default function Login() {
     <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-2xl font-bold">Login</h1>
       <form onSubmit={handleLogin} className="mt-4 space-y-4">
-        <input 
-          type="text" 
-          placeholder="Usuário" 
-          value={username} 
+        <input
+          type="text"
+          placeholder="Usuário"
+          value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="border p-2 rounded w-full"
         />
-        <input 
-          type="password" 
-          placeholder="Senha" 
-          value={senha} 
+        <input
+          type="password"
+          placeholder="Senha"
+          value={senha}
           onChange={(e) => setSenha(e.target.value)}
           className="border p-2 rounded w-full"
         />
