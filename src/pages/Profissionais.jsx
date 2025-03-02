@@ -27,7 +27,7 @@ export default function Profissionais() {
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/auth/register", novoProfissional, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
       setNovoProfissional({ nome: "", login: "", senha: "" });
       buscarProfissionais();
