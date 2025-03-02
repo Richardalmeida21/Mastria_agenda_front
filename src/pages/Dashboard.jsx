@@ -8,21 +8,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-        const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
+      try {
+        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (response.data.role === "CLIENTE") {
-          navigate("/dashboard/cliente"); // Redireciona o cliente para uma página específica
-        } else {
-          setUser(response.data); // Apenas usuários profissionais ou admin são exibidos no dashboard
+        console.log("Dados do usuário:", userResponse.data); // Verifique a resposta
+
+        setUser(userResponse.data);
+
+        if (userResponse.data.role !== "ADMIN" && userResponse.data.role !== "PROFISSIONAL") {
+          navigate("/dashboard");
         }
       } catch (err) {
         console.error("Erro ao buscar informações do usuário:", err);
@@ -40,7 +42,7 @@ export default function Dashboard() {
         <>
           <p>Bem-vindo, {user.nome}!</p>
           <p>Role: {user.role}</p>
-          <p>Email: {user.email}</p>
+          <p>Email: {user.email || "Não informado"}</p> {/* Exibe 'Não informado' se email estiver vazio */}
         </>
       ) : (
         <p>Carregando...</p>
