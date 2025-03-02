@@ -24,7 +24,7 @@ export default function Agendamentos() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setAgendamentos(response.data);
     } catch (err) {
@@ -36,11 +36,11 @@ export default function Agendamentos() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setClientes(response.data);
     } catch (err) {
-      console.error("Erro ao buscar clientes:", err);
+      setError("Erro ao buscar clientes.");
     }
   };
 
@@ -48,11 +48,11 @@ export default function Agendamentos() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProfissionais(response.data);
     } catch (err) {
-      console.error("Erro ao buscar profissionais:", err);
+      setError("Erro ao buscar profissionais.");
     }
   };
 
@@ -74,8 +74,19 @@ export default function Agendamentos() {
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
       buscarAgendamentos();
     } catch (err) {
-      console.error("Erro ao criar agendamento:", err.response);
-      setError("Erro ao criar agendamento. Verifique os dados.");
+      setError("Erro ao criar agendamento.");
+    }
+  };
+
+  const deletarAgendamento = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      buscarAgendamentos();
+    } catch (err) {
+      setError("Erro ao excluir agendamento.");
     }
   };
 
@@ -85,61 +96,57 @@ export default function Agendamentos() {
       {error && <p className="text-red-500">{error}</p>}
 
       <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
-        <select 
-          value={novoAgendamento.clienteId} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })} 
+        <select
+          value={novoAgendamento.clienteId}
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })}
           className="border p-2 rounded w-full"
         >
           <option value="">Selecione um Cliente</option>
-          {clientes.map(cliente => (
+          {clientes.map((cliente) => (
             <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
           ))}
         </select>
-
-        <select 
-          value={novoAgendamento.profissionalId} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })} 
+        <select
+          value={novoAgendamento.profissionalId}
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
           className="border p-2 rounded w-full"
         >
           <option value="">Selecione um Profissional</option>
-          {profissionais.map(profissional => (
+          {profissionais.map((profissional) => (
             <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
           ))}
         </select>
-
-        <select 
-          value={novoAgendamento.servico} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, servico: e.target.value })} 
+        <select
+          value={novoAgendamento.servico}
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, servico: e.target.value })}
           className="border p-2 rounded w-full"
         >
           <option value="MANICURE">Manicure</option>
           <option value="PEDICURE">Pedicure</option>
           <option value="CABELO">Cabelo</option>
-          <option value="DEPILACAO">Depilação</option>
-          <option value="PODOLOGIA">Podologia</option>
         </select>
-
-        <input 
-          type="date" 
-          value={novoAgendamento.data} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })} 
-          className="border p-2 rounded w-full" 
+        <input
+          type="date"
+          value={novoAgendamento.data}
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })}
+          className="border p-2 rounded w-full"
         />
-
-        <input 
-          type="time" 
-          value={novoAgendamento.hora} 
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })} 
-          className="border p-2 rounded w-full" 
+        <input
+          type="time"
+          value={novoAgendamento.hora}
+          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })}
+          className="border p-2 rounded w-full"
         />
-
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
       </form>
 
       <ul className="mt-4">
         {agendamentos.map((agendamento) => (
-          <li key={agendamento.id} className="border-b p-2">
-            {agendamento.cliente?.nome} - {agendamento.servico} - {agendamento.dataHora}
+          <li key={agendamento.id} className="border-b p-2 flex justify-between">
+            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.dataHora}</span>
+            <button onClick={() => deletarAgendamento(agendamento.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+              Excluir
+            </button>
           </li>
         ))}
       </ul>
