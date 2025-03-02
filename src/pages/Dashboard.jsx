@@ -19,7 +19,11 @@ export default function Dashboard() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setUser(response.data);
+        if (response.data.role === "CLIENTE") {
+          navigate("/dashboard/cliente"); // Redireciona o cliente para uma página específica
+        } else {
+          setUser(response.data); // Apenas usuários profissionais ou admin são exibidos no dashboard
+        }
       } catch (err) {
         console.error("Erro ao buscar informações do usuário:", err);
         navigate("/login");
