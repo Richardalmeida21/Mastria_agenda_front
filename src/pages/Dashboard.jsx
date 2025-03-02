@@ -1,5 +1,5 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Dashboard() {
@@ -7,43 +7,40 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-    if (!token) {
-      navigate("/");
-      return;
-    }
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    axios
-      .get("https://mastriaagenda-production.up.railway.app/auth/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
         setUser(response.data);
-      })
-      .catch((error) => {
-        console.error("Token inválido ou expirado", error);
-        localStorage.removeItem("token");
-        navigate("/");
-      });
+      } catch (err) {
+        console.error("Erro ao buscar informações do usuário:", err);
+        navigate("/login");
+      }
+    };
+
+    fetchUser();
   }, [navigate]);
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      {user && (
+      <h2 className="text-xl font-bold">Dashboard</h2>
+      {user ? (
         <>
           <p>Bem-vindo, {user.nome}!</p>
           <p>Role: {user.role}</p>
           <p>Email: {user.email}</p>
-          <nav className="mt-4 space-x-4">
-            <Link to="/dashboard/agendamentos" className="text-blue-500">Agendamentos</Link>
-            <Link to="/dashboard/clientes" className="text-blue-500">Clientes</Link>
-            <Link to="/dashboard/profissionais" className="text-blue-500">Profissionais</Link>
-          </nav>
         </>
+      ) : (
+        <p>Carregando...</p>
       )}
-      <Outlet />
     </div>
   );
 }
