@@ -81,7 +81,7 @@ export default function Profissionais() {
       <ul className="mt-4">
         {profissionais.map((profissional) => (
           <li key={profissional.id} className="border-b p-2 flex justify-between">
-            <span>{profissional.nome} - {profissional.login}</span>
+            <span>{profissional.nome} - {profissional.login} - {profissional.role}</span>
             <button onClick={() => deletarProfissional(profissional.id)} className="bg-red-500 text-white px-2 py-1 rounded">
               Excluir
             </button>
