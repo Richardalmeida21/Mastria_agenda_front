@@ -68,7 +68,7 @@ export default function Agendamentos() {
       };
 
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
 
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
