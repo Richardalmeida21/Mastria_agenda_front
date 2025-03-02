@@ -33,16 +33,11 @@ export default function Dashboard() {
     <div className="p-4">
       <h2 className="text-xl font-bold">Dashboard</h2>
       {user ? (
-        <>
+        <div>
           <p>Bem-vindo, {user.nome}!</p>
-          {user.role === "ADMIN" && (
-            <div className="mt-4">
-              <a href="/clientes" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Clientes</a>
-              <a href="/profissionais" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Profissionais</a>
-              <a href="/agendamentos" className="block bg-blue-500 text-white px-4 py-2 rounded">Gerenciar Agendamentos</a>
-            </div>
-          )}
-        </>
+          <p>Role: {user.role}</p>
+          <p>Email: {user.email}</p>
+        </div>
       ) : (
         <p>Carregando...</p>
       )}
