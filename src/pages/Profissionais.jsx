@@ -14,7 +14,7 @@ export default function Profissionais() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProfissionais(response.data);
     } catch (err) {
@@ -33,6 +33,18 @@ export default function Profissionais() {
       buscarProfissionais();
     } catch (err) {
       setError("Erro ao criar profissional.");
+    }
+  };
+
+  const deletarProfissional = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`https://mastriaagenda-production.up.railway.app/profissional/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      buscarProfissionais();
+    } catch (err) {
+      setError("Erro ao excluir profissional.");
     }
   };
 
@@ -68,7 +80,12 @@ export default function Profissionais() {
 
       <ul className="mt-4">
         {profissionais.map((profissional) => (
-          <li key={profissional.id} className="border-b p-2">{profissional.nome} - {profissional.login}</li>
+          <li key={profissional.id} className="border-b p-2 flex justify-between">
+            <span>{profissional.nome} - {profissional.login}</span>
+            <button onClick={() => deletarProfissional(profissional.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+              Excluir
+            </button>
+          </li>
         ))}
       </ul>
     </div>
