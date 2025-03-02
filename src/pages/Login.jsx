@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -15,8 +15,6 @@ export default function Login() {
         username,
         senha,
       });
-
-      console.log("Resposta da API:", response.data);
 
       const token = response.data.token;
       if (token) {
@@ -33,18 +31,19 @@ export default function Login() {
         setError("Erro: Token não recebido corretamente.");
       }
     } catch (err) {
-      console.log("Erro durante login:", err.response);
       setError("Login falhou. Verifique suas credenciais.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Login</h1>
+    <div className="p-4">
+      <h2 className="text-xl font-bold">Login</h2>
+      {error && <p className="text-red-500">{error}</p>}
+
       <form onSubmit={handleLogin} className="mt-4 space-y-4">
         <input
           type="text"
-          placeholder="Usuário"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="border p-2 rounded w-full"
@@ -56,10 +55,7 @@ export default function Login() {
           onChange={(e) => setSenha(e.target.value)}
           className="border p-2 rounded w-full"
         />
-        {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Entrar
-        </button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
       </form>
     </div>
   );
