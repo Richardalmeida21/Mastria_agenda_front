@@ -25,16 +25,8 @@ export default function Login() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const userData = userResponse.data;
-        
-        // Verifica se o usuário é admin ou profissional
-        if (userData.role === "CLIENTE") {
-          setError("Usuários clientes não têm acesso ao sistema.");
-          localStorage.removeItem("token"); // Remove o token para clientes
-        } else {
-          localStorage.setItem("user", JSON.stringify(userData));
-          navigate("/dashboard");
-        }
+        localStorage.setItem("user", JSON.stringify(userResponse.data));
+        navigate("/dashboard");
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
