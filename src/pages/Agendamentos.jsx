@@ -20,18 +20,30 @@ export default function Agendamentos() {
     buscarProfissionais();
   }, []);
 
+  // Função para buscar agendamentos, diferenciando Admin e Profissional
   const buscarAgendamentos = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAgendamentos(response.data);
+
+      const userRole = localStorage.getItem("role"); // Verifica o papel do usuário
+      if (userRole === 'PROFISSIONAL') {
+        // Filtra agendamentos relacionados ao profissional logado
+        const profissionalId = localStorage.getItem("profissionalId"); // ID do profissional logado
+        const agendamentosFiltrados = response.data.filter(agendamento => agendamento.profissional.id === profissionalId);
+        setAgendamentos(agendamentosFiltrados);
+      } else {
+        // Para admin, exibe todos os agendamentos
+        setAgendamentos(response.data);
+      }
     } catch (err) {
       setError("Erro ao buscar agendamentos.");
     }
   };
 
+  // Função para buscar clientes
   const buscarClientes = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -44,6 +56,7 @@ export default function Agendamentos() {
     }
   };
 
+  // Função para buscar profissionais
   const buscarProfissionais = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -56,6 +69,7 @@ export default function Agendamentos() {
     }
   };
 
+  // Função para criar um novo agendamento
   const criarAgendamento = async (e) => {
     e.preventDefault();
     try {
@@ -66,6 +80,12 @@ export default function Agendamentos() {
         servico: novoAgendamento.servico,
         dataHora: `${novoAgendamento.data}T${novoAgendamento.hora}:00`
       };
+
+      // Adiciona verificação de role e associa o profissional ao agendamento
+      const userRole = localStorage.getItem("role");
+      if (userRole !== "ADMIN") {
+        payload.profissionalId = localStorage.getItem("profissionalId"); // Associa o profissional logado
+      }
 
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
@@ -78,6 +98,7 @@ export default function Agendamentos() {
     }
   };
 
+  // Função para deletar agendamento
   const deletarAgendamento = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -95,6 +116,7 @@ export default function Agendamentos() {
       <h2 className="text-xl font-bold">Agendamentos</h2>
       {error && <p className="text-red-500">{error}</p>}
 
+      {/* Formulário para criar novo agendamento */}
       <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
         <select
           value={novoAgendamento.clienteId}
@@ -140,6 +162,7 @@ export default function Agendamentos() {
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
       </form>
 
+      {/* Lista de agendamentos */}
       <ul className="mt-4">
         {agendamentos.map((agendamento) => (
           <li key={agendamento.id} className="border-b p-2 flex justify-between">
