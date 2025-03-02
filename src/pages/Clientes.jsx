@@ -27,7 +27,7 @@ export default function Clientes() {
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/cliente", novoCliente, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setNovoCliente({ nome: "", email: "", telefone: "" });
       buscarClientes();
