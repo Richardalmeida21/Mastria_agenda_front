@@ -20,7 +20,6 @@ export default function Agendamentos() {
     buscarProfissionais();
   }, []);
 
-  // Função para buscar agendamentos, diferenciando Admin e Profissional
   const buscarAgendamentos = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -28,14 +27,14 @@ export default function Agendamentos() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const userRole = localStorage.getItem("role"); // Verifica o papel do usuário
+      const userRole = localStorage.getItem("role");
       if (userRole === 'PROFISSIONAL') {
-        // Filtra agendamentos relacionados ao profissional logado
-        const profissionalId = localStorage.getItem("profissionalId"); // ID do profissional logado
-        const agendamentosFiltrados = response.data.filter(agendamento => agendamento.profissional.id === profissionalId);
+        const profissionalId = Number(localStorage.getItem("profissionalId")); // Convertendo para número
+        const agendamentosFiltrados = response.data.filter(
+          (agendamento) => agendamento.profissional.id === profissionalId
+        );
         setAgendamentos(agendamentosFiltrados);
       } else {
-        // Para admin, exibe todos os agendamentos
         setAgendamentos(response.data);
       }
     } catch (err) {
@@ -43,7 +42,6 @@ export default function Agendamentos() {
     }
   };
 
-  // Função para buscar clientes
   const buscarClientes = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -56,7 +54,6 @@ export default function Agendamentos() {
     }
   };
 
-  // Função para buscar profissionais
   const buscarProfissionais = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -69,22 +66,22 @@ export default function Agendamentos() {
     }
   };
 
-  // Função para criar um novo agendamento
   const criarAgendamento = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      const userRole = localStorage.getItem("role");
+
       const payload = {
-        clienteId: novoAgendamento.clienteId,
-        profissionalId: novoAgendamento.profissionalId,
+        clienteId: Number(novoAgendamento.clienteId),
+        profissionalId: Number(novoAgendamento.profissionalId),
         servico: novoAgendamento.servico,
-        dataHora: `${novoAgendamento.data}T${novoAgendamento.hora}:00`
+        data: novoAgendamento.data,
+        hora: novoAgendamento.hora
       };
 
-      // Adiciona verificação de role e associa o profissional ao agendamento
-      const userRole = localStorage.getItem("role");
       if (userRole !== "ADMIN") {
-        payload.profissionalId = localStorage.getItem("profissionalId"); // Associa o profissional logado
+        payload.profissionalId = Number(localStorage.getItem("profissionalId"));
       }
 
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
@@ -98,7 +95,6 @@ export default function Agendamentos() {
     }
   };
 
-  // Função para deletar agendamento
   const deletarAgendamento = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -116,60 +112,43 @@ export default function Agendamentos() {
       <h2 className="text-xl font-bold">Agendamentos</h2>
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Formulário para criar novo agendamento */}
-      <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
-        <select
-          value={novoAgendamento.clienteId}
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })}
-          className="border p-2 rounded w-full"
-        >
-          <option value="">Selecione um Cliente</option>
-          {clientes.map((cliente) => (
-            <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
-          ))}
-        </select>
-        <select
-          value={novoAgendamento.profissionalId}
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
-          className="border p-2 rounded w-full"
-        >
-          <option value="">Selecione um Profissional</option>
-          {profissionais.map((profissional) => (
-            <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
-          ))}
-        </select>
-        <select
-          value={novoAgendamento.servico}
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, servico: e.target.value })}
-          className="border p-2 rounded w-full"
-        >
-          <option value="MANICURE">Manicure</option>
-          <option value="PEDICURE">Pedicure</option>
-          <option value="CABELO">Cabelo</option>
-        </select>
-        <input
-          type="date"
-          value={novoAgendamento.data}
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })}
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="time"
-          value={novoAgendamento.hora}
-          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })}
-          className="border p-2 rounded w-full"
-        />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
-      </form>
+      {localStorage.getItem("role") === "ADMIN" && (
+        <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
+          <select
+            value={novoAgendamento.clienteId}
+            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })}
+            className="border p-2 rounded w-full"
+          >
+            <option value="">Selecione um Cliente</option>
+            {clientes.map((cliente) => (
+              <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
+            ))}
+          </select>
+          <select
+            value={novoAgendamento.profissionalId}
+            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
+            className="border p-2 rounded w-full"
+          >
+            <option value="">Selecione um Profissional</option>
+            {profissionais.map((profissional) => (
+              <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
+            ))}
+          </select>
+          <input type="date" value={novoAgendamento.data} onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })} className="border p-2 rounded w-full" />
+          <input type="time" value={novoAgendamento.hora} onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })} className="border p-2 rounded w-full" />
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
+        </form>
+      )}
 
-      {/* Lista de agendamentos */}
       <ul className="mt-4">
         {agendamentos.map((agendamento) => (
           <li key={agendamento.id} className="border-b p-2 flex justify-between">
-            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.dataHora}</span>
-            <button onClick={() => deletarAgendamento(agendamento.id)} className="bg-red-500 text-white px-2 py-1 rounded">
-              Excluir
-            </button>
+            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.data} {agendamento.hora}</span>
+            {localStorage.getItem("role") === "ADMIN" && (
+              <button onClick={() => deletarAgendamento(agendamento.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+                Excluir
+              </button>
+            )}
           </li>
         ))}
       </ul>
