@@ -160,8 +160,8 @@ export default function Agendamentos() {
         {agendamentos.map((agendamento) => (
           <li key={agendamento.id} className="border-b p-2 flex justify-between">
             <span>
-              {agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} -{" "}
-              {agendamento.data} {agendamento.hora}
+              {agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.data}{" "}
+              {agendamento.hora}
             </span>
             {localStorage.getItem("role") === "ADMIN" && (
               <button
