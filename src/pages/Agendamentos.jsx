@@ -72,22 +72,20 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const userRole = localStorage.getItem("role");
 
+      // Preparando o payload
       const payload = {
         clienteId: Number(novoAgendamento.clienteId),
-        profissionalId: Number(novoAgendamento.profissionalId),
+        profissionalId: userRole === "ADMIN" ? Number(novoAgendamento.profissionalId) : Number(localStorage.getItem("profissionalId")), // Condicional para profissional
         servico: novoAgendamento.servico,
         data: novoAgendamento.data,
         hora: novoAgendamento.hora
       };
 
-      if (userRole !== "ADMIN") {
-        payload.profissionalId = Number(localStorage.getItem("profissionalId"));
-      }
-
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
 
+      // Resetando o formulário
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
       buscarAgendamentos();
     } catch (err) {
@@ -120,38 +118,37 @@ export default function Agendamentos() {
             className="border p-2 rounded w-full"
           >
             <option value="">Selecione um Cliente</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
-            ))}
+            {clientes.length > 0 ? (
+              clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
+              ))
+            ) : (
+              <option disabled>Sem clientes cadastrados</option>
+            )}
           </select>
+
           <select
             value={novoAgendamento.profissionalId}
             onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
             className="border p-2 rounded w-full"
           >
             <option value="">Selecione um Profissional</option>
-            {profissionais.map((profissional) => (
-              <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
-            ))}
-          </select>
-          <input type="date" value={novoAgendamento.data} onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })} className="border p-2 rounded w-full" />
-          <input type="time" value={novoAgendamento.hora} onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })} className="border p-2 rounded w-full" />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
-        </form>
-      )}
-
-      <ul className="mt-4">
-        {agendamentos.map((agendamento) => (
-          <li key={agendamento.id} className="border-b p-2 flex justify-between">
-            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.data} {agendamento.hora}</span>
-            {localStorage.getItem("role") === "ADMIN" && (
-              <button onClick={() => deletarAgendamento(agendamento.id)} className="bg-red-500 text-white px-2 py-1 rounded">
-                Excluir
-              </button>
+            {profissionais.length > 0 ? (
+              profissionais.map((profissional) => (
+                <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
+              ))
+            ) : (
+              <option disabled>Sem profissionais cadastrados</option>
             )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+          </select>
+
+          <input
+            type="date"
+            value={novoAgendamento.data}
+            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })}
+            className="border p-2 rounded w-full"
+          />
+
+          <input
+            type="time"
+            value={novoAgend
