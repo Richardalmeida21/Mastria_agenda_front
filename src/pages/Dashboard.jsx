@@ -11,7 +11,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      navigate("/");
+      navigate("/"); // Redireciona para a página de login se não houver token
       return;
     }
 
@@ -21,16 +21,20 @@ export default function Dashboard() {
       })
       .then((response) => {
         setUser(response.data);
-        setLoading(false);
+        setLoading(false); // Atualiza o estado de loading para false
       })
       .catch((error) => {
         console.error("Erro ao buscar usuário:", error);
-        navigate("/");
+        navigate("/"); // Redireciona para a página de login em caso de erro
       });
-  }, [navigate]);
+  }, [navigate]); // Não precisa de 'user' como dependência, apenas 'navigate'
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <div>Carregando...</div>; // Exibe "Carregando..." enquanto os dados estão sendo carregados
+  }
+
+  if (!user) {
+    return <div>Usuário não encontrado.</div>; // Em caso de erro, caso o 'user' seja null
   }
 
   return (
@@ -59,7 +63,7 @@ export default function Dashboard() {
         </>
       )}
 
-      <Outlet />
+      <Outlet /> {/* Exibe o conteúdo da rota filha */}
     </div>
   );
 }
