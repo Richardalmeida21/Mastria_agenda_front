@@ -21,7 +21,7 @@ export default function Login() {
         localStorage.setItem("token", token);
 
         // Busca informações do usuário autenticado
-        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
+        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
