@@ -1,61 +1,65 @@
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Dashboard() {
-  const [usuario, setUsuario] = useState(null);
-  const [profissionais, setProfissionais] = useState([]);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    buscarUsuario();
-    buscarProfissionais();
-  }, []);
+    const token = localStorage.getItem("token");
 
-  const buscarUsuario = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsuario(response.data);
-    } catch (err) {
-      setError("Erro ao buscar informações do usuário.");
+    if (!token) {
+      navigate("/");
+      return;
     }
-  };
 
-  const buscarProfissionais = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
+    axios
+      .get("https://mastriaagenda-production.up.railway.app/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setUser(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar usuário:", error);
+        navigate("/");
       });
-      setProfissionais(response.data || []);
-    } catch (err) {
-      setError("Erro ao buscar profissionais.");
-    }
-  };
+  }, [navigate]);
 
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (!usuario) return <p>Carregando...</p>;
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold">Dashboard</h2>
-      <p>Bem-vindo, {usuario.nome}!</p>
-      <p>Role: {usuario.role}</p>
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <p>Bem-vindo, {user.nome}!</p>
+      <p><strong>Role:</strong> {user.role}</p>
 
-      <h3 className="mt-4 text-lg font-semibold">Profissionais</h3>
-      {profissionais.length > 0 ? (
-        <ul>
-          {profissionais.map((prof) => (
-            <li key={prof.id} className="border-b p-2">
-              {prof.nome} - {prof.login}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Nenhum profissional encontrado.</p>
+      {/* Se for ADMIN, exibe todas as opções */}
+      {user.role === "ADMIN" && (
+        <>
+          <h2 className="mt-4 text-lg font-bold">Gerenciamento</h2>
+          <nav className="mt-2 space-x-4">
+            <Link to="/dashboard/agendamentos" className="text-blue-500">Agendamentos</Link>
+            <Link to="/dashboard/clientes" className="text-blue-500">Clientes</Link>
+            <Link to="/dashboard/profissionais" className="text-blue-500">Profissionais</Link>
+          </nav>
+        </>
       )}
+
+      {/* Se for PROFISSIONAL, exibe apenas os agendamentos dele */}
+      {user.role === "PROFISSIONAL" && (
+        <>
+          <h2 className="mt-4 text-lg font-bold">Seus Agendamentos</h2>
+          <Link to="/dashboard/agendamentos" className="text-blue-500">Ver Agendamentos</Link>
+        </>
+      )}
+
+      <Outlet />
     </div>
   );
 }
