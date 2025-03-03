@@ -7,16 +7,14 @@ import Clientes from "./pages/Clientes";
 import Profissionais from "./pages/Profissionais";
 
 function App() {
-  const [user, setUser] = useState({ name: "Usuário Teste" }); // Simula um login
-
   return (
     <Router>
       <Routes>
         {/* Página de Login */}
-        <Route path="/" element={<Login setUser={setUser} />} />
+        <Route path="/" element={<Login />} />
 
         {/* Dashboard com subpáginas */}
-        <Route path="/dashboard" element={<Dashboard user={user} />}>
+        <Route path="/dashboard" element={<Dashboard />}>
           <Route path="agendamentos" element={<Agendamentos />} />
           <Route path="clientes" element={<Clientes />} />
           <Route path="profissionais" element={<Profissionais />} />
