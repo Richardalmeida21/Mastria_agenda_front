@@ -16,7 +16,7 @@ export default function Profissionais() {
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProfissionais(response.data);
+      setProfissionais(response.data || []);
     } catch (err) {
       setError("Erro ao buscar profissionais.");
     }
@@ -27,7 +27,7 @@ export default function Profissionais() {
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/auth/register", novoProfissional, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       setNovoProfissional({ nome: "", login: "", senha: "" });
       buscarProfissionais();
@@ -75,14 +75,19 @@ export default function Profissionais() {
           onChange={(e) => setNovoProfissional({ ...novoProfissional, senha: e.target.value })}
           className="border p-2 rounded w-full"
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Profissional</button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          Criar Profissional
+        </button>
       </form>
 
       <ul className="mt-4">
         {profissionais.map((profissional) => (
           <li key={profissional.id} className="border-b p-2 flex justify-between">
-            <span>{profissional.nome} - {profissional.login} - {profissional.role}</span>
-            <button onClick={() => deletarProfissional(profissional.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+            <span>{profissional.nome} - {profissional.login}</span>
+            <button
+              onClick={() => deletarProfissional(profissional.id)}
+              className="bg-red-500 text-white px-2 py-1 rounded"
+            >
               Excluir
             </button>
           </li>
