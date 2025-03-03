@@ -49,6 +49,7 @@ export default function Agendamentos() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setClientes(response.data);
+      console.log("Clientes carregados:", response.data); // Verificação no console
     } catch (err) {
       setError("Erro ao buscar clientes.");
     }
@@ -61,6 +62,7 @@ export default function Agendamentos() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfissionais(response.data);
+      console.log("Profissionais carregados:", response.data); // Verificação no console
     } catch (err) {
       setError("Erro ao buscar profissionais.");
     }
@@ -113,47 +115,54 @@ export default function Agendamentos() {
       {error && <p className="text-red-500">{error}</p>}
 
       {localStorage.getItem("role") === "ADMIN" && (
-        <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
-          <select
-            value={novoAgendamento.clienteId}
-            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })}
-            className="border p-2 rounded w-full"
-          >
-            <option value="">Selecione um Cliente</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nome}
-              </option>
-            ))}
-          </select>
-          <select
-            value={novoAgendamento.profissionalId}
-            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
-            className="border p-2 rounded w-full"
-          >
-            <option value="">Selecione um Profissional</option>
-            {profissionais.map((profissional) => (
-              <option key={profissional.id} value={profissional.id}>
-                {profissional.nome}
-              </option>
-            ))}
-          </select>
-          <input
-            type="date"
-            value={novoAgendamento.data}
-            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })}
-            className="border p-2 rounded w-full"
-          />
-          <input
-            type="time"
-            value={novoAgendamento.hora}
-            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })}
-            className="border p-2 rounded w-full"
-          />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-            Criar Agendamento
-          </button>
-        </form>
+        <>
+          {/* Verificação de Clientes e Profissionais carregados */}
+          {clientes.length > 0 && profissionais.length > 0 ? (
+            <form onSubmit={criarAgendamento} className="mt-4 space-y-4">
+              <select
+                value={novoAgendamento.clienteId}
+                onChange={(e) => setNovoAgendamento({ ...novoAgendamento, clienteId: e.target.value })}
+                className="border p-2 rounded w-full"
+              >
+                <option value="">Selecione um Cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nome}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={novoAgendamento.profissionalId}
+                onChange={(e) => setNovoAgendamento({ ...novoAgendamento, profissionalId: e.target.value })}
+                className="border p-2 rounded w-full"
+              >
+                <option value="">Selecione um Profissional</option>
+                {profissionais.map((profissional) => (
+                  <option key={profissional.id} value={profissional.id}>
+                    {profissional.nome}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={novoAgendamento.data}
+                onChange={(e) => setNovoAgendamento({ ...novoAgendamento, data: e.target.value })}
+                className="border p-2 rounded w-full"
+              />
+              <input
+                type="time"
+                value={novoAgendamento.hora}
+                onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })}
+                className="border p-2 rounded w-full"
+              />
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                Criar Agendamento
+              </button>
+            </form>
+          ) : (
+            <p>Carregando dados de clientes e profissionais...</p>
+          )}
+        </>
       )}
 
       <ul className="mt-4">
