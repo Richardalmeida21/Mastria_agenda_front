@@ -31,7 +31,7 @@ export default function Agendamentos() {
         const [agendamentosRes, clientesRes, profissionaisRes] = await Promise.all([
           axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers }),
           axios.get("https://mastriaagenda-production.up.railway.app/cliente", { headers }),
-          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers })
+          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers }),
         ]);
 
         setAgendamentos(agendamentosRes.data);
@@ -59,9 +59,14 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
+      // Enviar o novo agendamento para o backend
+      const response = await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
+
+      // Atualizar a lista de agendamentos localmente sem recarregar a página
+      setAgendamentos([...agendamentos, response.data]);
+
+      // Resetar o formulário
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
-      window.location.reload();
     } catch (error) {
       setError("Erro ao criar agendamento.");
       console.error(error);
@@ -78,8 +83,11 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
+      // Excluir o agendamento no backend
       await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, { headers });
-      window.location.reload();
+
+      // Remover o agendamento excluído da lista localmente
+      setAgendamentos(agendamentos.filter(agendamento => agendamento.id !== id));
     } catch (error) {
       setError("Erro ao excluir agendamento.");
       console.error(error);
