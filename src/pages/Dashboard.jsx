@@ -15,7 +15,7 @@ export default function Dashboard() {
           return;
         }
 
-        const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/user", {
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
