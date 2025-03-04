@@ -31,4 +31,105 @@ export default function Agendamentos() {
         const [agendamentosRes, clientesRes, profissionaisRes] = await Promise.all([
           axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers }),
           axios.get("https://mastriaagenda-production.up.railway.app/cliente", { headers }),
-          axios.get("
+          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers }), // Correção aqui
+        ]);
+
+        setAgendamentos(agendamentosRes.data);
+        setClientes(clientesRes.data);
+        setProfissionais(profissionaisRes.data);
+      } catch (error) {
+        setError("Erro ao buscar os dados.");
+        console.error(error);
+      }
+    };
+
+    buscarDados();
+  }, [navigate]);
+
+  const handleChange = (e) => {
+    setNovoAgendamento({ ...novoAgendamento, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
+      setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
+      window.location.reload();
+    } catch (error) {
+      setError("Erro ao criar agendamento.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, { headers });
+      window.location.reload();
+    } catch (error) {
+      setError("Erro ao excluir agendamento.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Agendamentos</h1>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      
+      <form onSubmit={handleSubmit}>
+        <select name="clienteId" value={novoAgendamento.clienteId} onChange={handleChange} required>
+          <option value="">Selecione um cliente</option>
+          {clientes.map(cliente => (
+            <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
+          ))}
+        </select>
+
+        <select name="profissionalId" value={novoAgendamento.profissionalId} onChange={handleChange} required>
+          <option value="">Selecione um profissional</option>
+          {profissionais.map(profissional => (
+            <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
+          ))}
+        </select>
+
+        <select name="servico" value={novoAgendamento.servico} onChange={handleChange} required>
+          <option value="MANICURE">Manicure</option>
+          <option value="PEDICURE">Pedicure</option>
+          <option value="CABELO">Cabelo</option>
+        </select>
+
+        <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
+        <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
+
+        <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar"}</button>
+      </form>
+
+      <ul>
+        {agendamentos.map(agendamento => (
+          <li key={agendamento.id}>
+            {agendamento.cliente} - {agendamento.profissional} - {agendamento.servico} - {agendamento.data} - {agendamento.hora}
+            <button onClick={() => handleDelete(agendamento.id)} disabled={loading}>
+              {loading ? "Excluindo..." : "Excluir"}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
