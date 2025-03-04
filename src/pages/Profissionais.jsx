@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Profissionais() {
   const [profissionais, setProfissionais] = useState([]);
   const [novoProfissional, setNovoProfissional] = useState({ nome: "", login: "", senha: "" });
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    buscarProfissionais();
-  }, []);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redireciona para a página de login se o token não existir
+    } else {
+      buscarProfissionais();
+    }
+  }, [navigate]);
 
   const buscarProfissionais = async () => {
     try {
@@ -32,7 +39,7 @@ export default function Profissionais() {
       setNovoProfissional({ nome: "", login: "", senha: "" });
       buscarProfissionais();
     } catch (err) {
-      setError("Erro ao criar profissional.");
+      setError(err.response?.data?.message || "Erro ao criar profissional.");
     }
   };
 
