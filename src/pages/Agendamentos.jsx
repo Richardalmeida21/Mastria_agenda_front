@@ -14,6 +14,7 @@ export default function Agendamentos() {
   const [clientes, setClientes] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado de carregamento
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,25 +64,27 @@ export default function Agendamentos() {
 
   const criarAgendamento = async (e) => {
     e.preventDefault();
+    setLoading(true); // Inicia o carregamento
     try {
       const token = localStorage.getItem("token");
       const payload = {
         clienteId: novoAgendamento.clienteId,
         profissionalId: novoAgendamento.profissionalId,
         servico: novoAgendamento.servico,
-        data: novoAgendamento.data, // Envia apenas o campo data como string
-        hora: novoAgendamento.hora  // Envia apenas o campo hora como string
+        data: novoAgendamento.data,
+        hora: novoAgendamento.hora
       };
 
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
 
-      // Limpa o formulário após a criação
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
-      buscarAgendamentos();
+      buscarAgendamentos(); // Atualiza a lista de agendamentos
     } catch (err) {
       setError("Erro ao criar agendamento.");
+    } finally {
+      setLoading(false); // Finaliza o carregamento
     }
   };
 
@@ -146,7 +149,9 @@ export default function Agendamentos() {
           onChange={(e) => setNovoAgendamento({ ...novoAgendamento, hora: e.target.value })}
           className="border p-2 rounded w-full"
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Agendamento</button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded" disabled={loading}>
+          {loading ? "Criando..." : "Criar Agendamento"}
+        </button>
       </form>
 
       <ul className="mt-4">
