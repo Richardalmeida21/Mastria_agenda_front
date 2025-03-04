@@ -22,6 +22,7 @@ export default function Dashboard() {
         setUser(response.data);
       } catch (err) {
         console.error("Erro ao buscar informações do usuário:", err);
+        localStorage.removeItem("token");
         navigate("/login");
       }
     };
