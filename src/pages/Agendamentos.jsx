@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Agendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -13,48 +14,52 @@ export default function Agendamentos() {
   const [clientes, setClientes] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const buscarAgendamentos = async () => {
+      try {
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAgendamentos(response.data);
+      } catch (err) {
+        setError("Erro ao buscar agendamentos.");
+      }
+    };
+
+    const buscarClientes = async () => {
+      try {
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setClientes(response.data);
+      } catch (err) {
+        setError("Erro ao buscar clientes.");
+      }
+    };
+
+    const buscarProfissionais = async () => {
+      try {
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfissionais(response.data);
+      } catch (err) {
+        setError("Erro ao buscar profissionais.");
+      }
+    };
+
     buscarAgendamentos();
     buscarClientes();
     buscarProfissionais();
-  }, []);
-
-  const buscarAgendamentos = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setAgendamentos(response.data);
-    } catch (err) {
-      setError("Erro ao buscar agendamentos.");
-    }
-  };
-
-  const buscarClientes = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setClientes(response.data);
-    } catch (err) {
-      setError("Erro ao buscar clientes.");
-    }
-  };
-
-  const buscarProfissionais = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProfissionais(response.data);
-    } catch (err) {
-      setError("Erro ao buscar profissionais.");
-    }
-  };
+  }, [navigate]);
 
   const criarAgendamento = async (e) => {
     e.preventDefault();
