@@ -37,7 +37,7 @@ export default function Clientes() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setNovoCliente({ nome: "", email: "", telefone: "" });
-      buscarClientes();
+      buscarClientes(); // Atualiza a lista de clientes após a criação
     } catch (err) {
       setError("Erro ao criar cliente.");
     }
@@ -49,7 +49,7 @@ export default function Clientes() {
       await axios.delete(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      buscarClientes();
+      buscarClientes(); // Atualiza a lista de clientes após a exclusão
     } catch (err) {
       setError("Erro ao excluir cliente.");
     }
