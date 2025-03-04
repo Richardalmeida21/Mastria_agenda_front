@@ -69,13 +69,15 @@ export default function Agendamentos() {
         clienteId: novoAgendamento.clienteId,
         profissionalId: novoAgendamento.profissionalId,
         servico: novoAgendamento.servico,
-        dataHora: `${novoAgendamento.data}T${novoAgendamento.hora}:00`
+        data: novoAgendamento.data, // Envia apenas o campo data como string
+        hora: novoAgendamento.hora  // Envia apenas o campo hora como string
       };
 
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", payload, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
 
+      // Limpa o formulário após a criação
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
       buscarAgendamentos();
     } catch (err) {
@@ -129,8 +131,8 @@ export default function Agendamentos() {
           <option value="MANICURE">Manicure</option>
           <option value="PEDICURE">Pedicure</option>
           <option value="CABELO">Cabelo</option>
-          <option value="DEPILACAO">Cabelo</option>
-          <option value="PODOLOGIA">Cabelo</option>
+          <option value="DEPILACAO">Depilação</option>
+          <option value="PODOLOGIA">Podologia</option>
         </select>
         <input
           type="date"
@@ -150,7 +152,7 @@ export default function Agendamentos() {
       <ul className="mt-4">
         {agendamentos.map((agendamento) => (
           <li key={agendamento.id} className="border-b p-2 flex justify-between">
-            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.dataHora}</span>
+            <span>{agendamento.cliente.nome} - {agendamento.profissional.nome} - {agendamento.servico} - {agendamento.data} {agendamento.hora}</span>
             <button onClick={() => deletarAgendamento(agendamento.id)} className="bg-red-500 text-white px-2 py-1 rounded">
               Excluir
             </button>
