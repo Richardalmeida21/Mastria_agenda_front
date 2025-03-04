@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Outlet } from "react-router-dom";
 import axios from "axios";
 
 export default function Dashboard() {
@@ -40,15 +40,16 @@ export default function Dashboard() {
           <p>Email: {user.email}</p>
           {user.role === "ADMIN" && (
             <div className="mt-4">
-              <Link to="/clientes" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Clientes</Link>
-              <Link to="/profissionais" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Profissionais</Link>
-              <Link to="/agendamentos" className="block bg-blue-500 text-white px-4 py-2 rounded">Gerenciar Agendamentos</Link>
+              <Link to="clientes" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Clientes</Link>
+              <Link to="profissionais" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Profissionais</Link>
+              <Link to="agendamentos" className="block bg-blue-500 text-white px-4 py-2 rounded">Gerenciar Agendamentos</Link>
             </div>
           )}
         </div>
       ) : (
         <p>Carregando...</p>
       )}
+      <Outlet />
     </div>
   );
 }
