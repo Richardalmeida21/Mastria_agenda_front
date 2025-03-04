@@ -129,6 +129,8 @@ export default function Agendamentos() {
           <option value="MANICURE">Manicure</option>
           <option value="PEDICURE">Pedicure</option>
           <option value="CABELO">Cabelo</option>
+          <option value="DEPILACAO">Cabelo</option>
+          <option value="PODOLOGIA">Cabelo</option>
         </select>
         <input
           type="date"
