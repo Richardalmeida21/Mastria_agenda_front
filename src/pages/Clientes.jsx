@@ -9,29 +9,29 @@ export default function Clientes() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const buscarClientes = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
       return;
     }
 
-    const buscarClientes = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setClientes(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError("Erro ao buscar clientes.");
-        setLoading(false);
-      }
-    };
+    try {
+      setLoading(true);
+      const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setClientes(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError("Erro ao buscar clientes.");
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     buscarClientes();
-  }, [navigate]);
+  }, []); // Agora apenas dispara a busca ao carregar o componente
 
   const criarCliente = async (e) => {
     e.preventDefault();
