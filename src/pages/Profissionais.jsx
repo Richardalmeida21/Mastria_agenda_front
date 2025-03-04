@@ -6,6 +6,7 @@ export default function Profissionais() {
   const [profissionais, setProfissionais] = useState([]);
   const [novoProfissional, setNovoProfissional] = useState({ nome: "", login: "", senha: "" });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Para controlar o estado de carregamento
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function Profissionais() {
 
   const buscarProfissionais = async () => {
     try {
+      setLoading(true); // Ativa o carregamento ao buscar os dados
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
         headers: { Authorization: `Bearer ${token}` },
@@ -26,11 +28,14 @@ export default function Profissionais() {
       setProfissionais(response.data || []);
     } catch (err) {
       setError("Erro ao buscar profissionais.");
+    } finally {
+      setLoading(false); // Desativa o carregamento
     }
   };
 
   const criarProfissional = async (e) => {
     e.preventDefault();
+    setLoading(true); // Ativa o carregamento ao criar o profissional
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/auth/register", novoProfissional, {
@@ -40,18 +45,25 @@ export default function Profissionais() {
       buscarProfissionais();
     } catch (err) {
       setError(err.response?.data?.message || "Erro ao criar profissional.");
+    } finally {
+      setLoading(false); // Desativa o carregamento
     }
   };
 
   const deletarProfissional = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`https://mastriaagenda-production.up.railway.app/profissional/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      buscarProfissionais();
-    } catch (err) {
-      setError("Erro ao excluir profissional.");
+    if (window.confirm("Tem certeza que deseja excluir este profissional?")) { // Confirmar exclusão
+      setLoading(true); // Ativa o carregamento ao excluir
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`https://mastriaagenda-production.up.railway.app/profissional/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        buscarProfissionais();
+      } catch (err) {
+        setError("Erro ao excluir profissional.");
+      } finally {
+        setLoading(false); // Desativa o carregamento
+      }
     }
   };
 
@@ -82,8 +94,8 @@ export default function Profissionais() {
           onChange={(e) => setNovoProfissional({ ...novoProfissional, senha: e.target.value })}
           className="border p-2 rounded w-full"
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Criar Profissional
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded" disabled={loading}>
+          {loading ? "Criando..." : "Criar Profissional"}
         </button>
       </form>
 
@@ -94,8 +106,9 @@ export default function Profissionais() {
             <button
               onClick={() => deletarProfissional(profissional.id)}
               className="bg-red-500 text-white px-2 py-1 rounded"
+              disabled={loading}
             >
-              Excluir
+              {loading ? "Excluindo..." : "Excluir"}
             </button>
           </li>
         ))}
