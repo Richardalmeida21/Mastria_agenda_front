@@ -1,4 +1,6 @@
 import "../pages/styles/Login.css";
+import "../pages/styles/Global.css";
+import logo from "../pages/images/logo_maestria.png";
 
 import { useState } from "react";
 import axios from "axios";
@@ -49,33 +51,39 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-3xl font-bold text-center text-gold mb-6">Maestria</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    <div className="container">
+      <div className="container-login">
+        <div className="container-logo">
+          <img src={logo} alt="" />
+          <div className="text-logo">
+            <h2>Olá profissional maestria</h2>
+            <h3>Seja Bem-vinda!</h3>
+          </div>
+          </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin}>
+          <h2>Realize o Login para continuar</h2>
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Digite seu username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold"
           />
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Digite sua senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="w-full p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-gold"
+            className=""
           />
           <button
             type="submit"
-            className="w-full py-3 bg-gold text-black font-bold rounded-md hover:bg-gold-dark focus:outline-none focus:ring-2 focus:ring-gold"
+            className=""
             disabled={loading}
           >
             {loading ? "Carregando..." : "Entrar"}
           </button>
+          {error && <p className="erro-conexao">{error}</p>}
         </form>
       </div>
     </div>

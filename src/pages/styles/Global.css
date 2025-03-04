@@ -1,0 +1,12 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --gold:#e1c340;
+    --gold-transparent:#e1c34063;
+    --white-transparent:#ffffff8e;
+    --black:#000000;
+}
