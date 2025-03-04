@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telefone: "" });
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    buscarClientes();
-  }, []);
-
-  const buscarClientes = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setClientes(response.data);
-    } catch (err) {
-      setError("Erro ao buscar clientes.");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
     }
-  };
+
+    const buscarClientes = async () => {
+      try {
+        const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setClientes(response.data);
+      } catch (err) {
+        setError("Erro ao buscar clientes.");
+      }
+    };
+
+    buscarClientes();
+  }, [navigate]);
 
   const criarCliente = async (e) => {
     e.preventDefault();
