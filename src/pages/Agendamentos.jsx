@@ -31,7 +31,7 @@ export default function Agendamentos() {
         const [agendamentosRes, clientesRes, profissionaisRes] = await Promise.all([
           axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers }),
           axios.get("https://mastriaagenda-production.up.railway.app/cliente", { headers }),
-          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers }), // Correção aqui
+          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers })
         ]);
 
         setAgendamentos(agendamentosRes.data);
@@ -123,7 +123,9 @@ export default function Agendamentos() {
       <ul>
         {agendamentos.map(agendamento => (
           <li key={agendamento.id}>
-            {agendamento.cliente} - {agendamento.profissional} - {agendamento.servico} - {agendamento.data} - {agendamento.hora}
+            {agendamento.cliente?.nome || "Sem cliente"} - 
+            {agendamento.profissional?.nome || "Sem profissional"} - 
+            {agendamento.servico} - {agendamento.data} - {agendamento.hora}
             <button onClick={() => handleDelete(agendamento.id)} disabled={loading}>
               {loading ? "Excluindo..." : "Excluir"}
             </button>
