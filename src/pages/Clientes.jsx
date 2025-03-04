@@ -6,6 +6,7 @@ export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telefone: "" });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,12 +18,15 @@ export default function Clientes() {
 
     const buscarClientes = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClientes(response.data);
+        setLoading(false);
       } catch (err) {
         setError("Erro ao buscar clientes.");
+        setLoading(false);
       }
     };
 
@@ -59,6 +63,7 @@ export default function Clientes() {
     <div className="p-4">
       <h2 className="text-xl font-bold">Clientes</h2>
       {error && <p className="text-red-500">{error}</p>}
+      {loading && <p>Carregando...</p>}
 
       <form onSubmit={criarCliente} className="mt-4 space-y-4">
         <input
