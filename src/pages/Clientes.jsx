@@ -10,35 +10,20 @@ export default function Clientes() {
     buscarClientes();
   }, []);
 
-  // Função para buscar clientes, diferenciando Admin e Profissional
   const buscarClientes = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const userRole = localStorage.getItem("role"); // Verifica o papel do usuário
-      if (userRole === 'PROFISSIONAL') {
-        // Os profissionais não têm permissão para visualizar clientes, então eles não verão nada na lista
-        setClientes([]);
-      } else {
-        setClientes(response.data); // Admin pode ver todos os clientes
-      }
+      setClientes(response.data);
     } catch (err) {
       setError("Erro ao buscar clientes.");
     }
   };
 
-  // Função para criar cliente (só permitido para admin)
   const criarCliente = async (e) => {
     e.preventDefault();
-    const userRole = localStorage.getItem("role"); // Verifica o papel do usuário
-    if (userRole !== 'ADMIN') {
-      setError("Você não tem permissão para criar clientes.");
-      return;
-    }
-
     try {
       const token = localStorage.getItem("token");
       await axios.post("https://mastriaagenda-production.up.railway.app/cliente", novoCliente, {
@@ -51,14 +36,7 @@ export default function Clientes() {
     }
   };
 
-  // Função para deletar cliente (só permitido para admin)
   const deletarCliente = async (id) => {
-    const userRole = localStorage.getItem("role"); // Verifica o papel do usuário
-    if (userRole !== 'ADMIN') {
-      setError("Você não tem permissão para excluir clientes.");
-      return;
-    }
-
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, {
@@ -75,44 +53,38 @@ export default function Clientes() {
       <h2 className="text-xl font-bold">Clientes</h2>
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Formulário para criar um novo cliente */}
-      {localStorage.getItem("role") === "ADMIN" && (
-        <form onSubmit={criarCliente} className="mt-4 space-y-4">
-          <input
-            type="text"
-            placeholder="Nome"
-            value={novoCliente.nome}
-            onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
-            className="border p-2 rounded w-full"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={novoCliente.email}
-            onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
-            className="border p-2 rounded w-full"
-          />
-          <input
-            type="text"
-            placeholder="Telefone"
-            value={novoCliente.telefone}
-            onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
-            className="border p-2 rounded w-full"
-          />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Cliente</button>
-        </form>
-      )}
+      <form onSubmit={criarCliente} className="mt-4 space-y-4">
+        <input
+          type="text"
+          placeholder="Nome"
+          value={novoCliente.nome}
+          onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
+          className="border p-2 rounded w-full"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={novoCliente.email}
+          onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
+          className="border p-2 rounded w-full"
+        />
+        <input
+          type="text"
+          placeholder="Telefone"
+          value={novoCliente.telefone}
+          onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
+          className="border p-2 rounded w-full"
+        />
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Cliente</button>
+      </form>
 
-      {/* Lista de clientes */}
       <ul className="mt-4">
         {clientes.map((cliente) => (
           <li key={cliente.id} className="border-b p-2 flex justify-between">
             <span>{cliente.nome} - {cliente.email} - {cliente.telefone}</span>
-            {localStorage.getItem("role") === "ADMIN" && (
-              <button onClick={() => deletarCliente(cliente.id)} className="bg-red-500 text-white px-2 py-1 rounded">
-                Excluir
-              </button>
-            )}
+            <button onClick={() => deletarCliente(cliente.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+              Excluir
+            </button>
           </li>
         ))}
       </ul>
