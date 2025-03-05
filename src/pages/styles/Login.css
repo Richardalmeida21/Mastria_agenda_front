@@ -1,9 +1,9 @@
 /* Import Google Font */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 /* Global */
 body {
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #000;
@@ -43,8 +43,9 @@ body {
   gap: .5rem;
 }
 
-.text-logo h3 {
+.text-logo h2, .text-logo h3 {
   font-size: 1.5rem;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8); /* Borda discreta */
 }
 
 .container-logo img {
@@ -61,7 +62,7 @@ form {
   background: var(--gold-transparent);
   padding: 3rem 2rem;
   border-radius: .5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box-shadow discreto */
+  box-shadow: 0 4px 8px var(--gold-transparent); /* Box-shadow discreto */
 }
 
 input, button {
@@ -73,7 +74,7 @@ input, button {
 }
 
 input {
-  background-color:var(white-transparent);
+  background-color: var(--white-transparent);
   color: var(--black);
 }
 

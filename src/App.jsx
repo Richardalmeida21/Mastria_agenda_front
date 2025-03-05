@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Agendamentos from "./pages/Agendamentos";
 import Clientes from "./pages/Clientes";
 import Profissionais from "./pages/Profissionais";
+import AgendamentosProfissional from "./pages/ListAgendamentos";
 
 function App() {
   return (
@@ -13,11 +14,14 @@ function App() {
         <Route path="/" element={<Login />} />
 
         {/* Dashboard com subpáginas */}
-        <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="/dashboard" element={<Dashboard />} >
           <Route path="agendamentos" element={<Agendamentos />} />
           <Route path="clientes" element={<Clientes />} />
           <Route path="profissionais" element={<Profissionais />} />
         </Route>
+
+        {/* Página de agendamentos do profissional */}
+        <Route path="/agendamentos-profissional/:id" element={<AgendamentosProfissional />} />
       </Routes>
     </Router>
   );

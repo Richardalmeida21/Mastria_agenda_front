@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, Outlet } from "react-router-dom";
 import axios from "axios";
+import "./styles/Dashboard.css";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -31,18 +32,16 @@ export default function Dashboard() {
   }, [navigate]);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold">Dashboard</h2>
+    <div className="dashboard-container">
+      <h2 className="dashboard-header">Dashboard</h2>
       {user ? (
-        <div>
+        <div className="user-info">
           <p>Bem-vindo, {user.nome}!</p>
-          <p>Role: {user.role}</p>
-          <p>Email: {user.email}</p>
           {user.role === "ADMIN" && (
-            <div className="mt-4">
-              <Link to="clientes" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Clientes</Link>
-              <Link to="profissionais" className="block bg-blue-500 text-white px-4 py-2 rounded mb-2">Gerenciar Profissionais</Link>
-              <Link to="agendamentos" className="block bg-blue-500 text-white px-4 py-2 rounded">Gerenciar Agendamentos</Link>
+            <div className="admin-links">
+              <Link to="clientes" className="admin-link">Gerenciar Clientes</Link>
+              <Link to="profissionais" className="admin-link">Gerenciar Profissionais</Link>
+              <Link to="agendamentos" className="admin-link">Gerenciar Agendamentos</Link>
             </div>
           )}
         </div>

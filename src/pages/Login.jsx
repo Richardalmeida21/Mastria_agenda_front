@@ -34,7 +34,21 @@ export default function Login() {
         });
 
         localStorage.setItem("user", JSON.stringify(userResponse.data));
-        navigate("/dashboard");
+
+        console.log("User role:", userResponse.data.role); // Verifique se está vindo o role corretamente.
+
+        // Verificação do role do usuário para redirecionamento
+        const userRole = userResponse.data.role ? userResponse.data.role.trim().toUpperCase() : "";
+
+        if (userRole === "ADMIN") {
+          console.log("Redirecionando para o Dashboard...");
+          navigate("/dashboard"); // Certifique-se de que "/dashboard" é a rota correta
+        } else if (userRole === "PROFISSIONAL") {
+          console.log("Redirecionando para a página de agendamentos...");
+          navigate(`/agendamentos-profissional/${userResponse.data.id}`); // Certifique-se de que a URL está correta
+        } else {
+          setError("Erro: Usuário não autorizado.");
+        }
       } else {
         setError("Erro: Token não recebido corretamente.");
       }
@@ -54,12 +68,12 @@ export default function Login() {
     <div className="container">
       <div className="container-login">
         <div className="container-logo">
-          <img src={logo} alt="" />
+          <img src={logo} alt="Logo Maestria" />
           <div className="text-logo">
             <h2>Olá profissional maestria</h2>
             <h3>Seja Bem-vinda!</h3>
           </div>
-          </div>
+        </div>
 
         <form onSubmit={handleLogin}>
           <h2>Realize o Login para continuar</h2>
@@ -74,11 +88,9 @@ export default function Login() {
             placeholder="Digite sua senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className=""
           />
           <button
             type="submit"
-            className=""
             disabled={loading}
           >
             {loading ? "Carregando..." : "Entrar"}

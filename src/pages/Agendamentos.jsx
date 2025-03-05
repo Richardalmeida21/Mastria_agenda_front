@@ -15,6 +15,7 @@ export default function Agendamentos() {
   const [profissionais, setProfissionais] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,6 +51,18 @@ export default function Agendamentos() {
     setNovoAgendamento({ ...novoAgendamento, [e.target.name]: e.target.value });
   };
 
+  const buscarAgendamentos = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+      const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers });
+      setAgendamentos(response.data);
+    } catch (error) {
+      setError("Erro ao atualizar os agendamentos.");
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -59,11 +72,11 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Enviar o novo agendamento para o backend
-      const response = await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
+      // Criar agendamento
+      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
 
-      // Atualizar a lista de agendamentos localmente sem recarregar a página
-      setAgendamentos([...agendamentos, response.data]);
+      // Atualizar a lista de agendamentos
+      await buscarAgendamentos();
 
       // Resetar o formulário
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
@@ -76,7 +89,7 @@ export default function Agendamentos() {
   };
 
   const handleDelete = async (id) => {
-    setLoading(true);
+    setDeletingId(id);
     setError(null);
 
     try {
@@ -86,13 +99,13 @@ export default function Agendamentos() {
       // Excluir o agendamento no backend
       await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, { headers });
 
-      // Remover o agendamento excluído da lista localmente
-      setAgendamentos(agendamentos.filter(agendamento => agendamento.id !== id));
+      // Atualizar a lista de agendamentos
+      await buscarAgendamentos();
     } catch (error) {
       setError("Erro ao excluir agendamento.");
       console.error(error);
     } finally {
-      setLoading(false);
+      setDeletingId(null);
     }
   };
 
@@ -120,6 +133,8 @@ export default function Agendamentos() {
           <option value="MANICURE">Manicure</option>
           <option value="PEDICURE">Pedicure</option>
           <option value="CABELO">Cabelo</option>
+          <option value="PODOLOGIA">Podologia</option>
+          <option value="DEPILACAO">Depilação</option>
         </select>
 
         <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
@@ -134,8 +149,8 @@ export default function Agendamentos() {
             {agendamento.cliente?.nome || "Sem cliente"} - 
             {agendamento.profissional?.nome || "Sem profissional"} - 
             {agendamento.servico} - {agendamento.data} - {agendamento.hora}
-            <button onClick={() => handleDelete(agendamento.id)} disabled={loading}>
-              {loading ? "Excluindo..." : "Excluir"}
+            <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
+              {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
             </button>
           </li>
         ))}
