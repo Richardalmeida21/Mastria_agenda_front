@@ -65,18 +65,16 @@ export default function Login() {
   };
 
   return (
-    <div className="container">
       <div className="container-login">
         <div className="container-logo">
           <img src={logo} alt="Logo Maestria" />
           <div className="text-logo">
-            <h2>Olá profissional maestria</h2>
-            <h3>Seja Bem-vinda!</h3>
+            <h2>Agendamento Maestria</h2>
           </div>
         </div>
 
         <form onSubmit={handleLogin}>
-          <h2>Realize o Login para continuar</h2>
+          <h2>SING IN</h2>
           <input
             type="text"
             placeholder="Digite seu username"
@@ -98,6 +96,5 @@ export default function Login() {
           {error && <p className="erro-conexao">{error}</p>}
         </form>
       </div>
-    </div>
   );
 }

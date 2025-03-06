@@ -10,19 +10,15 @@ body {
   color: var(--gold);
 }
 
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+
 
 .container-login {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  width: 100%;
   height: 100vh;
+  gap: 2rem;
 }
 
 .container-logo {
@@ -30,7 +26,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .text-logo {
@@ -43,30 +39,32 @@ body {
   gap: .5rem;
 }
 
-.text-logo h2, .text-logo h3 {
-  font-size: 1.5rem;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8); /* Borda discreta */
+.text-logo h2 {
+  font-size:1.8rem;
+  letter-spacing: 2px;
 }
 
 .container-logo img {
-  width: 50%;
+  width: 25%;
 }
 
 form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1rem;
   text-align: center;
   text-transform: uppercase;
   color: white;
-  background: var(--gold-transparent);
-  padding: 3rem 2rem;
+  padding: 1rem;
+  width: 40%;
   border-radius: .5rem;
-  box-shadow: 0 4px 8px var(--gold-transparent); /* Box-shadow discreto */
+  box-shadow: 0 2px 6px var(--gold-transparent), 0 4px 18px var(--gold-transparent); /* Box-shadow discreto */
 }
 
-input, button {
-  padding: .75rem 1rem;
+input {
+  padding:1rem;
+  width: 90%;
   text-align: center;
   border: none;
   border-radius: .25rem;
@@ -74,12 +72,14 @@ input, button {
 }
 
 input {
-  background-color: var(--white-transparent);
-  color: var(--black);
+  background-color: var(--gold-transparent);
+  color: var(--white);
+  border: 1px solid var(--white-transparent);
+  border-radius: 2rem;
 }
 
 input::placeholder {
-  color: var(--black);
+  color: var(--white-transparent);
 }
 
 button {
@@ -87,7 +87,10 @@ button {
   color: var(--black);
   cursor: pointer;
   text-transform: uppercase;
-  margin-top: .5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  width: 70%;
+  border-radius: 2rem;
 }
 
 .erro-conexao {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { format, addDays, parseISO, compareAsc } from "date-fns";
+import { ptBR } from 'date-fns/locale';
 import "../pages/styles/ListAgendamentos.css"; // Importar o arquivo CSS
 
 export default function AgendamentosProfissional() {
@@ -10,8 +11,16 @@ export default function AgendamentosProfissional() {
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
   const [showNext7Days, setShowNext7Days] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams(); // Obter o ID do profissional a partir dos parâmetros da URL
+
+  useEffect(() => {
+    document.body.classList.add('list-agendamentos');
+    return () => {
+      document.body.classList.remove('list-agendamentos');
+    };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,15 +43,45 @@ export default function AgendamentosProfissional() {
         );
 
         const sortedAgendamentos = response.data.sort((a, b) => compareAsc(parseISO(a.data), parseISO(b.data)));
-        setAgendamentos(sortedAgendamentos);
-        setFilteredAgendamentos(sortedAgendamentos);
+
+        // Recuperar observações do localStorage
+        const storedObservacoes = JSON.parse(localStorage.getItem("observacoes")) || {};
+
+        // Combinar observações com agendamentos
+        const agendamentosComObservacoes = sortedAgendamentos.map(agendamento => ({
+          ...agendamento,
+          observacao: storedObservacoes[agendamento.id] || agendamento.observacao || "Sem observação"
+        }));
+
+        setAgendamentos(agendamentosComObservacoes);
+        setFilteredAgendamentos(agendamentosComObservacoes);
       } catch (error) {
         setError("Erro ao buscar os agendamentos.");
         console.error(error);
       }
     };
 
+    // Função para buscar as informações do usuário
+    const fetchUser = async () => {
+      try {
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Faz a requisição para obter as informações do usuário
+        const response = await axios.get(
+          `https://mastriaagenda-production.up.railway.app/auth/me`,
+          { headers }
+        );
+
+        setUser(response.data);
+      } catch (err) {
+        console.error("Erro ao buscar informações do usuário:", err);
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    };
+
     buscarAgendamentos();
+    fetchUser();
   }, [navigate, id]);
 
   const handleFilterChange = (e) => {
@@ -91,13 +130,17 @@ export default function AgendamentosProfissional() {
 
     return Object.keys(groupedAgendamentos).map((date) => (
       <div key={date} className="calendar-row">
-        <div className="calendar-date">{format(parseISO(date), 'dd MMM')}</div>
+        <div className="calendar-date">
+          <p>AGENDAMENTOS: </p>
+          {format(parseISO(date), "dd 'de' MMMM", { locale: ptBR })}
+        </div>
         <div className="calendar-content">
           {groupedAgendamentos[date].map((agendamento) => (
             <div key={agendamento.id} className="calendar-item">
               <p>{agendamento.cliente?.nome || "Sem cliente"}</p>
               <p>{agendamento.servico}</p>
-              <p>{agendamento.hora}</p>
+              <p>{agendamento.hora.slice(0, 5)}</p> {/* Formatação correta da hora */}
+              <p>{agendamento.observacao}</p> {/* Adicionando a observação */}
             </div>
           ))}
         </div>
@@ -107,23 +150,32 @@ export default function AgendamentosProfissional() {
 
   return (
     <div>
-      <h1>Seus Agendamentos</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <header>
+        {user ? (
+          <h2>Bem-vinda, {user.nome}!</h2>
+        ) : (
+          <p>Carregando...</p>
+        )}
+        <h2>CONFIRA SEUS AGENDAMENTOS</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </header>
 
       <div className="filter-container">
-        <label htmlFor="filter-date">Filtrar por data:</label>
+        <label htmlFor="filter-date">Filtrar Agendamentos</label>
         <input
           type="date"
           id="filter-date"
           value={filterDate}
           onChange={handleFilterChange}
         />
-        <button onClick={handleShowNext7Days}>Próximos 7 dias</button>
-        <button onClick={handleShowAll}>Mostrar todos</button>
+        <div className="container-btn">
+          <button onClick={handleShowNext7Days}>Próximos 7 dias</button>
+          <button onClick={handleShowAll}>Mostrar todos</button>
+        </div>
       </div>
 
       <div className="calendar">
-        {showNext7Days ? renderAgendamentos(filteredAgendamentos) : renderAgendamentos(filteredAgendamentos)}
+        {renderAgendamentos(filteredAgendamentos)}
       </div>
     </div>
   );

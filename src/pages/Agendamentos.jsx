@@ -10,6 +10,7 @@ export default function Agendamentos() {
     servico: "MANICURE",
     data: "",
     hora: "",
+    observacao: "", // Adicionando o campo de observação
   });
   const [clientes, setClientes] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
@@ -49,6 +50,9 @@ export default function Agendamentos() {
 
   const handleChange = (e) => {
     setNovoAgendamento({ ...novoAgendamento, [e.target.name]: e.target.value });
+    if (e.target.name === "data" || e.target.name === "hora") {
+      setError(null); // Limpar a mensagem de erro ao corrigir a data ou hora
+    }
   };
 
   const buscarAgendamentos = async () => {
@@ -68,6 +72,15 @@ export default function Agendamentos() {
     setLoading(true);
     setError(null);
 
+    // Verificar se a data do agendamento é no futuro ou hoje
+    const hoje = new Date();
+    const dataAgendamento = new Date(`${novoAgendamento.data}T${novoAgendamento.hora}`);
+    if (dataAgendamento < hoje.setHours(0, 0, 0, 0)) {
+      setError("Por favor, agende uma data futura ou a data atual.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
@@ -79,7 +92,7 @@ export default function Agendamentos() {
       await buscarAgendamentos();
 
       // Resetar o formulário
-      setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "" });
+      setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "", observacao: "" });
     } catch (error) {
       setError("Erro ao criar agendamento.");
       console.error(error);
@@ -139,6 +152,15 @@ export default function Agendamentos() {
 
         <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
         <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
+        
+        {/* Adicionando o campo de observação */}
+        <input
+          type="text"
+          name="observacao"
+          value={novoAgendamento.observacao}
+          onChange={handleChange}
+          placeholder="Tipo de serviço"
+        />
 
         <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar"}</button>
       </form>
