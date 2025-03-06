@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns"; // Importar funções necessárias
+import { ptBR } from "date-fns/locale"; // Importar locale para formatação em português
+import "../pages/styles/Agendamentos.css";
+import "../pages/styles/Global.css"; 
 
 export default function Agendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -10,7 +14,7 @@ export default function Agendamentos() {
     servico: "MANICURE",
     data: "",
     hora: "",
-    observacao: "", // Adicionando o campo de observação
+    observacao: "", 
   });
   const [clientes, setClientes] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
@@ -36,6 +40,10 @@ export default function Agendamentos() {
           axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers }),
         ]);
 
+        console.log("Agendamentos:", agendamentosRes.data);
+        console.log("Clientes:", clientesRes.data);
+        console.log("Profissionais:", profissionaisRes.data);
+
         setAgendamentos(agendamentosRes.data);
         setClientes(clientesRes.data);
         setProfissionais(profissionaisRes.data);
@@ -51,7 +59,7 @@ export default function Agendamentos() {
   const handleChange = (e) => {
     setNovoAgendamento({ ...novoAgendamento, [e.target.name]: e.target.value });
     if (e.target.name === "data" || e.target.name === "hora") {
-      setError(null); // Limpar a mensagem de erro ao corrigir a data ou hora
+      setError(null); 
     }
   };
 
@@ -60,6 +68,7 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
       const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers });
+      console.log("Agendamentos atualizados:", response.data);
       setAgendamentos(response.data);
     } catch (error) {
       setError("Erro ao atualizar os agendamentos.");
@@ -72,11 +81,10 @@ export default function Agendamentos() {
     setLoading(true);
     setError(null);
 
-    // Verificar se a data do agendamento é no futuro ou hoje
     const hoje = new Date();
     const dataAgendamento = new Date(`${novoAgendamento.data}T${novoAgendamento.hora}`);
-    if (dataAgendamento < hoje.setHours(0, 0, 0, 0)) {
-      setError("Por favor, agende uma data futura ou a data atual.");
+    if (dataAgendamento < hoje) {
+      setError("Por favor, agende para um horário futuro.");
       setLoading(false);
       return;
     }
@@ -85,13 +93,8 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Criar agendamento
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
-
-      // Atualizar a lista de agendamentos
       await buscarAgendamentos();
-
-      // Resetar o formulário
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "", observacao: "" });
     } catch (error) {
       setError("Erro ao criar agendamento.");
@@ -109,10 +112,7 @@ export default function Agendamentos() {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Excluir o agendamento no backend
       await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, { headers });
-
-      // Atualizar a lista de agendamentos
       await buscarAgendamentos();
     } catch (error) {
       setError("Erro ao excluir agendamento.");
@@ -122,61 +122,88 @@ export default function Agendamentos() {
     }
   };
 
+  const renderAgendamentos = (agendamentos) => {
+    const groupedAgendamentos = agendamentos.reduce((acc, agendamento) => {
+      const date = agendamento.data;
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(agendamento);
+      return acc;
+    }, {});
+
+    return Object.keys(groupedAgendamentos).map((date) => (
+      <div key={date} className="calendar-row">
+        <div className="calendar-date">
+          <p>AGENDAMENTOS: </p>
+          {format(parseISO(date), "dd 'de' MMMM", { locale: ptBR })}
+        </div>
+        <div className="calendar-content">
+          {groupedAgendamentos[date].map((agendamento) => (
+            <div key={agendamento.id} className="calendar-item agendamento-item">
+              <p>{agendamento.cliente?.nome || "Sem cliente"}</p>
+              <p>{agendamento.profissional?.nome || "Sem profissional"}</p> {/* Adicionando o nome do profissional */}
+              <p>{agendamento.servico}</p>
+              <p>{agendamento.hora.slice(0, 5)}</p> {/* Formatação correta da hora */}
+              <p>{agendamento.observacao}</p> {/* Adicionando a observação */}
+              <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
+                {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    ));
+  };
+
   return (
-    <div>
+    <div className="container-agendamentos">
       <h1>Agendamentos</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       
-      <form onSubmit={handleSubmit}>
-        <select name="clienteId" value={novoAgendamento.clienteId} onChange={handleChange} required>
-          <option value="">Selecione um cliente</option>
-          {clientes.map(cliente => (
-            <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
-          ))}
-        </select>
+      <form className="form-agendamentos" onSubmit={handleSubmit}>
+        <h2>Crie um agendamento</h2>
+        <div className="container-selects-agendamentos">
+          <select name="clienteId" value={novoAgendamento.clienteId} onChange={handleChange} required>
+            <option value="">Cliente</option>
+            {clientes.map(cliente => (
+              <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
+            ))}
+          </select>
+          <select name="profissionalId" value={novoAgendamento.profissionalId} onChange={handleChange} required>
+            <option value="">Profissional</option>
+            {profissionais.map(profissional => (
+              <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
+            ))}
+          </select>
+          <select name="servico" value={novoAgendamento.servico} onChange={handleChange} required>
+            <option value="MANICURE">Manicure</option>
+            <option value="PEDICURE">Pedicure</option>
+            <option value="CABELO">Cabelo</option>
+            <option value="PODOLOGIA">Podologia</option>
+            <option value="DEPILACAO">Depilação</option>
+          </select>
+        </div>
 
-        <select name="profissionalId" value={novoAgendamento.profissionalId} onChange={handleChange} required>
-          <option value="">Selecione um profissional</option>
-          {profissionais.map(profissional => (
-            <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
-          ))}
-        </select>
+        <div className="container-inputs-agendamentos">
+          <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
+          <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
+          
+          <input
+            type="text"
+            name="observacao"
+            value={novoAgendamento.observacao}
+            onChange={handleChange}
+            placeholder="Descrição do Serviço"
+          />
+        </div>
 
-        <select name="servico" value={novoAgendamento.servico} onChange={handleChange} required>
-          <option value="MANICURE">Manicure</option>
-          <option value="PEDICURE">Pedicure</option>
-          <option value="CABELO">Cabelo</option>
-          <option value="PODOLOGIA">Podologia</option>
-          <option value="DEPILACAO">Depilação</option>
-        </select>
-
-        <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
-        <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
-        
-        {/* Adicionando o campo de observação */}
-        <input
-          type="text"
-          name="observacao"
-          value={novoAgendamento.observacao}
-          onChange={handleChange}
-          placeholder="Tipo de serviço"
-        />
-
-        <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar"}</button>
+        <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar Horario"}</button>
       </form>
 
-      <ul>
-        {agendamentos.map(agendamento => (
-          <li key={agendamento.id}>
-            {agendamento.cliente?.nome || "Sem cliente"} - 
-            {agendamento.profissional?.nome || "Sem profissional"} - 
-            {agendamento.servico} - {agendamento.data} - {agendamento.hora}
-            <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
-              {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="calendar">
+        {renderAgendamentos(agendamentos)}
+      </div>
     </div>
   );
 }

@@ -1,51 +1,75 @@
+.dashboard-body {
+  background-color: var(--white);
+}
+
 .dashboard-container {
-    padding: 2rem;
-    background-color: #f9f9f9;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 2rem auto;
-  }
+  width: 100%;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+ }
   
-  .dashboard-header {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: #333;
-    text-align: center;
-  }
-  
+ .header-dashboard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+ }
+
+ .header-dashboard h2 {
+  font-size: 1.5rem;
+ }
+
+.header-dashboard img {
+  width: 4%;
+}
+
   .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 2rem;
     text-align: center;
+    width: 100%;
+    background-color: var(--black);
+    margin: 2rem 0;
+    padding: 2rem 0;
   }
   
   .user-info p {
     margin: 0.5rem 0;
-    color: #555;
+    color: var(--gold);
+    font-size: 1.5rem;
   }
   
   .admin-links {
     margin-top: 2rem;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: space-around;
+    width: 100%;
   }
   
   .admin-link {
     display: block;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--gold);
+    color: var(--black);
+    font-weight: bold;
     padding: 0.75rem 1rem;
     border-radius: 0.25rem;
     text-align: center;
     margin-bottom: 0.5rem;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: border 0.5s ease;
     width: 100%;
     max-width: 300px;
   }
   
   .admin-link:hover {
-    background-color: #0056b3;
+    border: 1px solid var(--white);
   }

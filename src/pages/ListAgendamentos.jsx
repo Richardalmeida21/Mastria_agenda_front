@@ -136,7 +136,7 @@ export default function AgendamentosProfissional() {
         </div>
         <div className="calendar-content">
           {groupedAgendamentos[date].map((agendamento) => (
-            <div key={agendamento.id} className="calendar-item">
+            <div key={agendamento.id} className="calendar-item list-agendamento-item">
               <p>{agendamento.cliente?.nome || "Sem cliente"}</p>
               <p>{agendamento.servico}</p>
               <p>{agendamento.hora.slice(0, 5)}</p> {/* Formatação correta da hora */}
@@ -156,7 +156,7 @@ export default function AgendamentosProfissional() {
         ) : (
           <p>Carregando...</p>
         )}
-        <h2>CONFIRA SEUS AGENDAMENTOS</h2>
+        <h3>CONFIRA SEUS AGENDAMENTOS</h3>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </header>
 

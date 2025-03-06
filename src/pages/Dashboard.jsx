@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, Outlet } from "react-router-dom";
 import axios from "axios";
-import "./styles/Dashboard.css";
+import "../pages/styles/Dashboard.css";
+import "../pages/styles/Global.css";
+import logo from "../pages/images/logo_maestria.png";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -16,6 +18,7 @@ export default function Dashboard() {
           return;
         }
 
+
         const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -29,11 +32,22 @@ export default function Dashboard() {
     };
 
     fetchUser();
+
+    // Adicionar classe ao body
+    document.body.classList.add("dashboard-body");
+
+    // Remover classe ao desmontar o componente
+    return () => {
+      document.body.classList.remove("dashboard-body");
+    };
   }, [navigate]);
 
   return (
     <div className="dashboard-container">
-      <h2 className="dashboard-header">Dashboard</h2>
+      <header className="header-dashboard">
+        <h2>Dashboard Maestria</h2>
+        <img src={logo} alt="" />
+      </header>
       {user ? (
         <div className="user-info">
           <p>Bem-vindo, {user.nome}!</p>
