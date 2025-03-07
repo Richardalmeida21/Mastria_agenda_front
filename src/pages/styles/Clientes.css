@@ -1,0 +1,109 @@
+.container-clientes {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    border-radius: 2rem;
+    padding: 2rem;
+}
+
+.container-clientes h2 {
+    padding: .5rem 2rem;
+    color: var(--black);
+    border-radius: 1rem;
+    font-weight: bolder;
+}
+
+.form-clientes {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    margin: 2rem 0;
+    color: var(--black);
+    box-shadow: 0 2px 6px var(--gold), 0 4px 18px var(--gold);
+    font-weight: bolder;
+}
+
+.form-clientes input {
+    width: 100%;
+    background: var(--gold);
+    color: var(--black);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    font-weight: bolder;
+}
+
+.form-clientes input::placeholder {
+    color: var(--black);
+    font-weight: bold;
+}
+
+.btn-form-clientes {
+    padding: 1rem;
+    width: 50%;
+    font-weight: bolder;
+    border: none;
+    color: var(--black);
+    background-color: var(--gold);
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.tabela-clientes {
+    width: 100%;
+    margin-top: 2rem;
+    border-collapse: collapse;
+}
+
+.tabela-clientes th, .tabela-clientes td {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-weight: bolder;
+}
+
+.tabela-clientes th {
+    background-color: var(--black);
+    color: var(--gold);
+}
+
+.tabela-clientes td {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.tabela-clientes button {
+    background-color: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+td input {
+    color: var(--black);
+}
+
+td input::placeholder {
+    color: var(--black);
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+    .btn-form-clientes {
+        width: 100%;
+    }
+
+    .tabela-clientes th, .tabela-clientes td {
+        padding: 0.5rem;
+    }
+}

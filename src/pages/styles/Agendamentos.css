@@ -1,155 +1,96 @@
-.container-agendamentos {
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .container-agendamentos h1 {
-    background-color: var(--black);
-    padding: .5rem 2rem;
-    color: var(--gold);
-    border-radius: 1rem;
-  }
-  
-  .form-agendamentos {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    margin: 2rem 0;
-    color: var(--black);
-  }
-  
-  .form-agendamentos button {
-    padding: 1rem;
-    width: 50%;
-    font-weight: bold;
-  }
-  
-  .container-selects-agendamentos {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    width: 100%;
-    margin: 1rem 0;
-  }
-  
-  .container-selects-agendamentos select {
-    width: 30%;
-    background-color: var(--gold);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    margin: 0.5rem;
-  }
-  
-  .container-inputs-agendamentos {
-    display: flex;
-    width: 100%;
-  }
-  
-  .container-inputs-agendamentos input {
-    width: 40%;
-    background: var(--gold);
-    color: var(--black);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    margin: 0.5rem;
-  }
-  
-  .container-inputs-agendamentos input::placeholder {
-    color: var(--black);
-  }
-  
-  .calendar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .calendar-row {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .calendar-date {
-    display: flex;
-    gap: .5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    color: var(--black);
-    font-size: 1.2rem;
-  }
-  
-  .calendar-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .agendamento-item {
-    background-color: black;
-    padding: 1rem;
-    width: 250px; 
-    box-shadow: 0 4px 8px var(--gold-transparent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: .5rem;
-    font-weight: bolder;
-    text-align: center;
-  }
-  
-  .calendar-content p {
-    margin: 0.25rem 0;
-  }
-  
-  /* Media Queries for Mobile Responsiveness */
-  @media (max-width: 768px) {
-    .container-btn {
-      width: 90%;
-      flex-direction: column;
-    }
-  
-    .container-btn button {
-      width: 100%;
-    }
-  
-    .calendar-item {
-      width: 200px; /* Ajustar o tamanho para dispositivos móveis */
-    }
-  }
-  
-  @media (max-width: 480px) {
-    header {
-      padding: 1rem;
-    }
-  
-    .filter-container {
-      margin: 2rem 0;
-    }
-  
-    .calendar-date {
-      font-size: 1rem;
-    }
-  
-    .calendar-item {
-      width: 150px; /* Ajustar o tamanho para dispositivos móveis */
-      padding: 1rem 2rem;
-    }
-  }
+/* Estilos para a tabela de agendamentos */
+.tabela-agendamentos {
+  width: 100%;
+  height: 100vh; /* Ocupa toda a altura da tela */
+  border-collapse: collapse;
+  table-layout: fixed; /* Divide os espaços igualmente */
+}
+
+.tabela-agendamentos th, .tabela-agendamentos td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden; /* Garante que o conteúdo não ultrapasse os limites da célula */
+}
+
+.tabela-agendamentos th {
+  background-color: var(--gold);
+  color: var(--black);
+}
+
+.tabela-agendamentos td.agendado {
+  background-color: var(--light-gray);
+}
+
+.tabela-agendamentos td.agendado div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tabela-agendamentos td.agendado button {
+  margin-top: 0.5rem;
+  background-color: var(--red);
+  color: var(--white);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+/* Estilos para o modal */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 80%; /* Ajuste a largura conforme necessário */
+  max-width: 600px; /* Limite a largura máxima */
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal form select,
+.modal form input {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  width: 100%; /* Ocupa toda a largura do modal */
+  box-sizing: border-box; /* Inclui padding e border na largura total */
+}
+
+.modal form button {
+  background-color: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  align-self: flex-end; /* Alinha o botão à direita */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}

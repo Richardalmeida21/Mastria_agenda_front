@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns"; // Importar funções necessárias
-import { ptBR } from "date-fns/locale"; // Importar locale para formatação em português
+import { format, addMinutes, startOfDay, endOfDay } from "date-fns";
+import Modal from "react-modal";
 import "../pages/styles/Agendamentos.css";
 import "../pages/styles/Global.css"; 
+
+Modal.setAppElement("#root");
 
 export default function Agendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -21,6 +23,8 @@ export default function Agendamentos() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,6 +100,8 @@ export default function Agendamentos() {
       await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
       await buscarAgendamentos();
       setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "", observacao: "" });
+      setSelectedSlot(null);
+      setModalIsOpen(false);
     } catch (error) {
       setError("Erro ao criar agendamento.");
       console.error(error);
@@ -122,38 +128,69 @@ export default function Agendamentos() {
     }
   };
 
-  const renderAgendamentos = (agendamentos) => {
-    const groupedAgendamentos = agendamentos.reduce((acc, agendamento) => {
-      const date = agendamento.data;
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(agendamento);
-      return acc;
-    }, {});
+  const generateTimeSlots = () => {
+    const slots = [];
+    let start = startOfDay(new Date());
+    start.setHours(7, 0, 0, 0);
+    const end = endOfDay(new Date());
+    end.setHours(20, 0, 0, 0);
 
-    return Object.keys(groupedAgendamentos).map((date) => (
-      <div key={date} className="calendar-row">
-        <div className="calendar-date">
-          <p>AGENDAMENTOS: </p>
-          {format(parseISO(date), "dd 'de' MMMM", { locale: ptBR })}
-        </div>
-        <div className="calendar-content">
-          {groupedAgendamentos[date].map((agendamento) => (
-            <div key={agendamento.id} className="calendar-item agendamento-item">
-              <p>{agendamento.cliente?.nome || "Sem cliente"}</p>
-              <p>{agendamento.profissional?.nome || "Sem profissional"}</p> {/* Adicionando o nome do profissional */}
-              <p>{agendamento.servico}</p>
-              <p>{agendamento.hora.slice(0, 5)}</p> {/* Formatação correta da hora */}
-              <p>{agendamento.observacao}</p> {/* Adicionando a observação */}
-              <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
-                {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
+    while (start <= end) {
+      slots.push(format(start, "HH:mm"));
+      start = addMinutes(start, 5);
+    }
+
+    return slots;
+  };
+
+  const handleSlotClick = (profissionalId, slot) => {
+    setSelectedSlot({ profissionalId, slot });
+    setNovoAgendamento({ ...novoAgendamento, profissionalId, hora: slot });
+    setModalIsOpen(true);
+  };
+
+  const renderAgendamentos = () => {
+    const timeSlots = generateTimeSlots();
+
+    return (
+      <table className="tabela-agendamentos">
+        <thead>
+          <tr>
+            <th>Horário</th>
+            {profissionais.map((profissional) => (
+              <th key={profissional.id}>{profissional.nome}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {timeSlots.map((slot) => (
+            <tr key={slot}>
+              <td>{slot}</td>
+              {profissionais.map((profissional) => {
+                const agendamento = agendamentos.find(
+                  (a) => a.profissionalId === profissional.id && a.hora === slot
+                );
+                return (
+                  <td key={profissional.id} className={agendamento ? "agendado" : ""} onClick={() => handleSlotClick(profissional.id, slot)}>
+                    {agendamento ? (
+                      <div>
+                        <p>{agendamento.cliente?.nome}</p>
+                        <p>{agendamento.servico}</p>
+                        <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
+                          {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
+                        </button>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
           ))}
-        </div>
-      </div>
-    ));
+        </tbody>
+      </table>
+    );
   };
 
   return (
@@ -161,19 +198,31 @@ export default function Agendamentos() {
       <h1>Agendamentos</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       
-      <form className="form-agendamentos" onSubmit={handleSubmit}>
-        <h2>Crie um agendamento</h2>
-        <div className="container-selects-agendamentos">
+      <div className="calendar">
+        {renderAgendamentos()}
+      </div>
+
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        contentLabel="Agendar Horário"
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <button className="close-button" onClick={() => setModalIsOpen(false)}>X</button>
+        <h2>Agendar Horário</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="date"
+            name="data"
+            value={novoAgendamento.data}
+            onChange={handleChange}
+            required
+          />
           <select name="clienteId" value={novoAgendamento.clienteId} onChange={handleChange} required>
             <option value="">Cliente</option>
             {clientes.map(cliente => (
               <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
-            ))}
-          </select>
-          <select name="profissionalId" value={novoAgendamento.profissionalId} onChange={handleChange} required>
-            <option value="">Profissional</option>
-            {profissionais.map(profissional => (
-              <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
             ))}
           </select>
           <select name="servico" value={novoAgendamento.servico} onChange={handleChange} required>
@@ -183,12 +232,6 @@ export default function Agendamentos() {
             <option value="PODOLOGIA">Podologia</option>
             <option value="DEPILACAO">Depilação</option>
           </select>
-        </div>
-
-        <div className="container-inputs-agendamentos">
-          <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
-          <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
-          
           <input
             type="text"
             name="observacao"
@@ -196,14 +239,9 @@ export default function Agendamentos() {
             onChange={handleChange}
             placeholder="Descrição do Serviço"
           />
-        </div>
-
-        <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar Horario"}</button>
-      </form>
-
-      <div className="calendar">
-        {renderAgendamentos(agendamentos)}
-      </div>
+          <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar"}</button>
+        </form>
+      </Modal>
     </div>
   );
 }

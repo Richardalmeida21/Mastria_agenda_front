@@ -59,10 +59,15 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
       ) : (
         <p>Carregando...</p>
       )}
       <Outlet />
+
+      <div className="container-logo-fixed">
+        <img className="logo-dashboard" src={logo} alt="" />
+        </div>
     </div>
   );
 }
