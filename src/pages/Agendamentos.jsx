@@ -1,209 +1,241 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import styles from "../pages/styles/Agendamentos.module.css"; // Importa o CSS Module
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns"; // Importar funções necessárias
-import { ptBR } from "date-fns/locale"; // Importar locale para formatação em português
-import "../pages/styles/Agendamentos.css";
-import "../pages/styles/Global.css"; 
 
 export default function Agendamentos() {
-  const [agendamentos, setAgendamentos] = useState([]);
-  const [novoAgendamento, setNovoAgendamento] = useState({
-    clienteId: "",
-    profissionalId: "",
-    servico: "MANICURE",
-    data: "",
-    hora: "",
-    observacao: "", 
-  });
-  const [clientes, setClientes] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
+  const [agendamentos, setAgendamentos] = useState([]); // Estado que mantém os agendamentos
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [agendamentoData, setAgendamentoData] = useState({
+    clienteNome: "",
+    clienteTelefone: "",
+    clienteEmail: "",
+    profissionalId: null,
+    hora: "",
+  });
+  const [currentDate, setCurrentDate] = useState(new Date()); // Estado para a data atual
+  const [currentDateFormatted, setCurrentDateFormatted] = useState(""); // Estado para a data formatada
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  // Função para buscar os agendamentos e os profissionais
+  const fetchAgendamentos = async () => {
+    try {
+      setLoading(true); // Marca como carregando enquanto busca dados
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("Token não encontrado, redirecionando para o login...");
+        navigate("/login"); // Redireciona caso o token esteja ausente
+        return;
+      }
+
+      const profissionaisResponse = await axios.get(
+        "https://mastriaagenda-production.up.railway.app/profissional", {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setProfissionais(profissionaisResponse.data);
+
+      // Log para ver a data que estamos buscando
+      console.log("Buscando agendamentos para a data:", currentDateFormatted);
+
+      const agendamentosResponse = await axios.get(
+        `https://mastriaagenda-production.up.railway.app/agendamento?data=${currentDateFormatted}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setAgendamentos(agendamentosResponse.data); // Atualiza os agendamentos com a resposta da API
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+      localStorage.removeItem("token");
       navigate("/login");
-      return;
-    }
-
-    const buscarDados = async () => {
-      try {
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [agendamentosRes, clientesRes, profissionaisRes] = await Promise.all([
-          axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers }),
-          axios.get("https://mastriaagenda-production.up.railway.app/cliente", { headers }),
-          axios.get("https://mastriaagenda-production.up.railway.app/profissional", { headers }),
-        ]);
-
-        console.log("Agendamentos:", agendamentosRes.data);
-        console.log("Clientes:", clientesRes.data);
-        console.log("Profissionais:", profissionaisRes.data);
-
-        setAgendamentos(agendamentosRes.data);
-        setClientes(clientesRes.data);
-        setProfissionais(profissionaisRes.data);
-      } catch (error) {
-        setError("Erro ao buscar os dados.");
-        console.error(error);
-      }
-    };
-
-    buscarDados();
-  }, [navigate]);
-
-  const handleChange = (e) => {
-    setNovoAgendamento({ ...novoAgendamento, [e.target.name]: e.target.value });
-    if (e.target.name === "data" || e.target.name === "hora") {
-      setError(null); 
-    }
-  };
-
-  const buscarAgendamentos = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/agendamento", { headers });
-      console.log("Agendamentos atualizados:", response.data);
-      setAgendamentos(response.data);
-    } catch (error) {
-      setError("Erro ao atualizar os agendamentos.");
-      console.error(error);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const hoje = new Date();
-    const dataAgendamento = new Date(`${novoAgendamento.data}T${novoAgendamento.hora}`);
-    if (dataAgendamento < hoje) {
-      setError("Por favor, agende para um horário futuro.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-
-      await axios.post("https://mastriaagenda-production.up.railway.app/agendamento", novoAgendamento, { headers });
-      await buscarAgendamentos();
-      setNovoAgendamento({ clienteId: "", profissionalId: "", servico: "MANICURE", data: "", hora: "", observacao: "" });
-    } catch (error) {
-      setError("Erro ao criar agendamento.");
-      console.error(error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Marca como não carregando depois de buscar os dados
     }
   };
 
-  const handleDelete = async (id) => {
-    setDeletingId(id);
-    setError(null);
+  // Usamos um useEffect para garantir que a data formatada é atualizada
+  useEffect(() => {
+    const formattedDate = currentDate.toISOString().split("T")[0];
+    setCurrentDateFormatted(formattedDate); // Atualiza a data formatada para o formato correto
+  }, [currentDate]);
 
-    try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-
-      await axios.delete(`https://mastriaagenda-production.up.railway.app/agendamento/${id}`, { headers });
-      await buscarAgendamentos();
-    } catch (error) {
-      setError("Erro ao excluir agendamento.");
-      console.error(error);
-    } finally {
-      setDeletingId(null);
+  // A requisição de agendamentos só acontece quando a data formatada for alterada
+  useEffect(() => {
+    if (currentDateFormatted) {
+      setAgendamentos([]); // Limpa os agendamentos antigos ao mudar a data
+      fetchAgendamentos(); // Chama a função para buscar os agendamentos para a nova data
     }
-  };
+  }, [currentDateFormatted]); // Dependência da data formatada
 
-  const renderAgendamentos = (agendamentos) => {
-    const groupedAgendamentos = agendamentos.reduce((acc, agendamento) => {
-      const date = agendamento.data;
-      if (!acc[date]) {
-        acc[date] = [];
+  // Função para comparar hora no formato correto
+  const getAgendamentoForTime = (profissionalId, hora) => {
+    return agendamentos.find(
+      (agendamento) => {
+        const agendamentoHora = agendamento.hora ? agendamento.hora.substring(0, 5) : null;
+        return agendamento.profissional.id === profissionalId && agendamentoHora === hora;
       }
-      acc[date].push(agendamento);
-      return acc;
-    }, {});
+    );
+  };
 
-    return Object.keys(groupedAgendamentos).map((date) => (
-      <div key={date} className="calendar-row">
-        <div className="calendar-date">
-          <p>AGENDAMENTOS: </p>
-          {format(parseISO(date), "dd 'de' MMMM", { locale: ptBR })}
-        </div>
-        <div className="calendar-content">
-          {groupedAgendamentos[date].map((agendamento) => (
-            <div key={agendamento.id} className="calendar-item agendamento-item">
-              <p>{agendamento.cliente?.nome || "Sem cliente"}</p>
-              <p>{agendamento.profissional?.nome || "Sem profissional"}</p> {/* Adicionando o nome do profissional */}
-              <p>{agendamento.servico}</p>
-              <p>{agendamento.hora.slice(0, 5)}</p> {/* Formatação correta da hora */}
-              <p>{agendamento.observacao}</p> {/* Adicionando a observação */}
-              <button onClick={() => handleDelete(agendamento.id)} disabled={deletingId === agendamento.id}>
-                {deletingId === agendamento.id ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
+  // Função que renderiza a tabela
+  const renderTabela = () => {
+    const horarios = [];
+    for (let h = 7; h <= 20; h++) {
+      for (let m = 0; m < 60; m += 5) {
+        const horaFormatada = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+        horarios.push(horaFormatada);
+      }
+    }
+
+    return (
+      <table className={styles.agendamentosTabela}>
+        <thead>
+          <tr>
+            <th>Horário</th>
+            {profissionais.map((profissional) => (
+              <th key={profissional.id}>{profissional.nome}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {horarios.map((hora) => (
+            <tr key={hora}>
+              <td>{hora}</td>
+              {profissionais.map((profissional) => {
+                const agendamento = getAgendamentoForTime(profissional.id, hora);
+                return (
+                  <td
+                    key={profissional.id}
+                    className={styles.agendamentoCell}
+                    onClick={() => handleCellClick(profissional.id, hora, agendamento)}
+                  >
+                    {agendamento ? (
+                      <div className={styles.agendamentoInfo}>
+                        <p>{agendamento.cliente.nome}</p>
+                        <p>{agendamento.observacao}</p>
+                      </div>
+                    ) : (
+                      <span>Disponível</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
           ))}
-        </div>
-      </div>
-    ));
+        </tbody>
+      </table>
+    );
+  };
+
+  // Função de clique na célula da tabela
+  const handleCellClick = (profissionalId, hora, agendamento) => {
+    if (!agendamento) {
+      setAgendamentoData({
+        ...agendamentoData,
+        profissionalId,
+        hora,
+      });
+      setShowModal(true);
+    }
+  };
+
+  // Função para lidar com a mudança de valores no formulário
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setAgendamentoData({
+      ...agendamentoData,
+      [name]: value,
+    });
+  };
+
+  // Função para agendar
+  const handleAgendar = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "https://mastriaagenda-production.up.railway.app/agendamento",
+        {
+          clienteId: agendamentoData.clienteId,
+          profissionalId: agendamentoData.profissionalId,
+          hora: agendamentoData.hora,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Agendamento criado com sucesso!");
+      setShowModal(false);
+      fetchAgendamentos(); // Recarregar agendamentos após o agendamento
+    } catch (error) {
+      console.error("Erro ao agendar:", error);
+      alert("Erro ao criar agendamento");
+    }
+  };
+
+  // Função para fechar o modal
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
-    <div className="container-agendamentos">
-      <h1>Agendamentos</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      
-      <form className="form-agendamentos" onSubmit={handleSubmit}>
-        <h2>Crie um agendamento</h2>
-        <div className="container-selects-agendamentos">
-          <select name="clienteId" value={novoAgendamento.clienteId} onChange={handleChange} required>
-            <option value="">Cliente</option>
-            {clientes.map(cliente => (
-              <option key={cliente.id} value={cliente.id}>{cliente.nome}</option>
-            ))}
-          </select>
-          <select name="profissionalId" value={novoAgendamento.profissionalId} onChange={handleChange} required>
-            <option value="">Profissional</option>
-            {profissionais.map(profissional => (
-              <option key={profissional.id} value={profissional.id}>{profissional.nome}</option>
-            ))}
-          </select>
-          <select name="servico" value={novoAgendamento.servico} onChange={handleChange} required>
-            <option value="MANICURE">Manicure</option>
-            <option value="PEDICURE">Pedicure</option>
-            <option value="CABELO">Cabelo</option>
-            <option value="PODOLOGIA">Podologia</option>
-            <option value="DEPILACAO">Depilação</option>
-          </select>
-        </div>
-
-        <div className="container-inputs-agendamentos">
-          <input type="date" name="data" value={novoAgendamento.data} onChange={handleChange} required />
-          <input type="time" name="hora" value={novoAgendamento.hora} onChange={handleChange} required />
-          
-          <input
-            type="text"
-            name="observacao"
-            value={novoAgendamento.observacao}
-            onChange={handleChange}
-            placeholder="Descrição do Serviço"
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>{loading ? "Agendando..." : "Agendar Horario"}</button>
-      </form>
-
-      <div className="calendar">
-        {renderAgendamentos(agendamentos)}
+    <div className={styles.agendamentosContainer}>
+      <h2>Agendamentos</h2>
+      <div className={styles.dateNavigation}>
+        <DatePicker
+          selected={currentDate}
+          onChange={(date) => setCurrentDate(date)}
+          dateFormat="dd/MM/yyyy"
+          className={styles.datePicker}
+        />
       </div>
+      {loading ? <p className="aviso-carregando">Carregando...</p> : renderTabela()}
+
+      {showModal && (
+        <div className={styles.agendamentoModal}>
+          <div className={styles.agendamentoModalContent}>
+            <h3>Agendar Atendimento</h3>
+            <form onSubmit={handleAgendar}>
+              <div>
+                <label>Nome do Cliente:</label>
+                <input
+                  type="text"
+                  name="clienteNome"
+                  value={agendamentoData.clienteNome}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Telefone do Cliente:</label>
+                <input
+                  type="text"
+                  name="clienteTelefone"
+                  value={agendamentoData.clienteTelefone}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <label>Email do Cliente:</label>
+                <input
+                  type="email"
+                  name="clienteEmail"
+                  value={agendamentoData.clienteEmail}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <button type="submit">Confirmar Agendamento</button>
+              <button type="button" onClick={closeModal}>Cancelar</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

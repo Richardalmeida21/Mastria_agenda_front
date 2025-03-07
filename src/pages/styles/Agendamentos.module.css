@@ -1,0 +1,110 @@
+/* Estilo para o container principal de agendamentos */
+.agendamentosContainer {
+  width: 100%;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Estilo para o cabeçalho */
+.agendamentosContainer h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Estilo para a tabela */
+.agendamentosTabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: var(--white);
+  color: var(--black);
+}
+
+.agendamentosTabela th, .agendamentosTabela td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+/* Estilo para cabeçalhos das colunas */
+.agendamentosTabela th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Estilo para as células */
+.agendamentoCell {
+  cursor: pointer;
+  padding: 10px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+/* Alterando a cor de fundo das células ao passar o mouse */
+.agendamentoCell:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Estilo para o conteúdo do agendamento (informações do cliente) */
+.agendamentoInfo {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* Modal */
+.agendamentoModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.agendamentoModalContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+  max-width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+}
+
+.agendamentoModal.show {
+  display: flex;
+}
+
+/* Estilos do formulário no modal */
+.agendamentoModal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.agendamentoModal input {
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.agendamentoModal button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.agendamentoModal button:hover {
+  background-color: #0056b3;
+}
