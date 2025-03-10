@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./styles/Clientes.css"; // Importar o arquivo CSS
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telefone: "" });
+  const [clienteEditando, setClienteEditando] = useState(null);
+  const [clienteEditandoId, setClienteEditandoId] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +34,7 @@ export default function Clientes() {
 
   useEffect(() => {
     buscarClientes();
-  }, []); // Agora apenas dispara a busca ao carregar o componente
+  }, []);
 
   const criarCliente = async (e) => {
     e.preventDefault();
@@ -41,9 +44,28 @@ export default function Clientes() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setNovoCliente({ nome: "", email: "", telefone: "" });
-      buscarClientes(); // Atualiza a lista de clientes após a criação
+      buscarClientes();
     } catch (err) {
       setError("Erro ao criar cliente.");
+    }
+  };
+
+  const editarCliente = (cliente) => {
+    setClienteEditando(cliente);
+    setClienteEditandoId(cliente.id);
+  };
+
+  const atualizarCliente = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, clienteEditando, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      setClienteEditando(null);
+      setClienteEditandoId(null);
+      buscarClientes();
+    } catch (err) {
+      setError("Erro ao atualizar cliente.");
     }
   };
 
@@ -53,53 +75,97 @@ export default function Clientes() {
       await axios.delete(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      buscarClientes(); // Atualiza a lista de clientes após a exclusão
+      buscarClientes();
     } catch (err) {
       setError("Erro ao excluir cliente.");
     }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold">Clientes</h2>
+    <div className="container-clientes">
+      <h2>Clientes</h2>
       {error && <p className="text-red-500">{error}</p>}
       {loading && <p>Carregando...</p>}
 
-      <form onSubmit={criarCliente} className="mt-4 space-y-4">
+      <form onSubmit={criarCliente} className="form-clientes">
         <input
           type="text"
           placeholder="Nome"
           value={novoCliente.nome}
           onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
-          className="border p-2 rounded w-full"
         />
         <input
           type="email"
           placeholder="Email"
           value={novoCliente.email}
           onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
-          className="border p-2 rounded w-full"
         />
         <input
           type="text"
           placeholder="Telefone"
           value={novoCliente.telefone}
           onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
-          className="border p-2 rounded w-full"
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Criar Cliente</button>
+        <button type="submit" className="btn-form-clientes">Criar Cliente</button>
       </form>
 
-      <ul className="mt-4">
-        {clientes.map((cliente) => (
-          <li key={cliente.id} className="border-b p-2 flex justify-between">
-            <span>{cliente.nome} - {cliente.email} - {cliente.telefone}</span>
-            <button onClick={() => deletarCliente(cliente.id)} className="bg-red-500 text-white px-2 py-1 rounded">
-              Excluir
-            </button>
-          </li>
-        ))}
-      </ul>
+      <table className="tabela-clientes">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clientes.map((cliente) => (
+            <tr key={cliente.id}>
+              <td>
+                {clienteEditandoId === cliente.id ? (
+                  <input
+                    type="text"
+                    value={clienteEditando.nome}
+                    onChange={(e) => setClienteEditando({ ...clienteEditando, nome: e.target.value })}
+                  />
+                ) : (
+                  cliente.nome
+                )}
+              </td>
+              <td>
+                {clienteEditandoId === cliente.id ? (
+                  <input
+                    type="email"
+                    value={clienteEditando.email}
+                    onChange={(e) => setClienteEditando({ ...clienteEditando, email: e.target.value })}
+                  />
+                ) : (
+                  cliente.email
+                )}
+              </td>
+              <td>
+                {clienteEditandoId === cliente.id ? (
+                  <input
+                    type="text"
+                    value={clienteEditando.telefone}
+                    onChange={(e) => setClienteEditando({ ...clienteEditando, telefone: e.target.value })}
+                  />
+                ) : (
+                  cliente.telefone
+                )}
+              </td>
+              <td>
+                {clienteEditandoId === cliente.id ? (
+                  <button onClick={() => atualizarCliente(cliente.id)}>Salvar</button>
+                ) : (
+                  <button onClick={() => editarCliente(cliente)}>Editar</button>
+                )}
+                <button onClick={() => deletarCliente(cliente.id)}>Excluir</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
