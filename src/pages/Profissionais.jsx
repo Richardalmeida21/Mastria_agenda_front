@@ -22,7 +22,7 @@ export default function Profissionais() {
     try {
       setLoading(true); // Ativa o carregamento ao buscar os dados
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/profissional", {
+      const response = await axios.get("https://mastria-agenda.fly.dev/profissional", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfissionais(response.data || []);
@@ -38,7 +38,7 @@ export default function Profissionais() {
     setLoading(true); // Ativa o carregamento ao criar o profissional
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://mastriaagenda-production.up.railway.app/auth/register", novoProfissional, {
+      await axios.post("https://mastria-agenda.fly.dev/auth/register", novoProfissional, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       setNovoProfissional({ nome: "", login: "", senha: "" });
@@ -55,7 +55,7 @@ export default function Profissionais() {
       setLoading(true); // Ativa o carregamento ao excluir
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`https://mastriaagenda-production.up.railway.app/profissional/${id}`, {
+        await axios.delete(`https://mastria-agenda.fly.dev/profissional/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         buscarProfissionais();

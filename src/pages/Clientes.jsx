@@ -21,7 +21,7 @@ export default function Clientes() {
 
     try {
       setLoading(true);
-      const response = await axios.get("https://mastriaagenda-production.up.railway.app/cliente", {
+      const response = await axios.get("https://mastria-agenda.fly.dev/cliente", { // Novo link da API
         headers: { Authorization: `Bearer ${token}` },
       });
       setClientes(response.data);
@@ -40,7 +40,7 @@ export default function Clientes() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://mastriaagenda-production.up.railway.app/cliente", novoCliente, {
+      await axios.post("https://mastria-agenda.fly.dev/cliente", novoCliente, { // Novo link da API
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setNovoCliente({ nome: "", email: "", telefone: "" });
@@ -58,7 +58,7 @@ export default function Clientes() {
   const atualizarCliente = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, clienteEditando, {
+      await axios.put(`https://mastria-agenda.fly.dev/cliente/${id}`, clienteEditando, { // Novo link da API
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setClienteEditando(null);
@@ -72,7 +72,7 @@ export default function Clientes() {
   const deletarCliente = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://mastriaagenda-production.up.railway.app/cliente/${id}`, {
+      await axios.delete(`https://mastria-agenda.fly.dev/cliente/${id}`, { // Novo link da API
         headers: { Authorization: `Bearer ${token}` },
       });
       buscarClientes();

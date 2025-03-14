@@ -19,7 +19,7 @@ export default function Dashboard() {
         }
 
 
-        const response = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
+        const response = await axios.get("https://mastria-agenda.fly.dev/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

@@ -38,7 +38,7 @@ export default function AgendamentosProfissional() {
 
         // Faz a requisição para obter os agendamentos do profissional
         const response = await axios.get(
-          `https://mastriaagenda-production.up.railway.app/agendamento/profissional`,
+          `https://mastria-agenda.fly.dev/agendamento/profissional`,
           { headers }
         );
 
@@ -68,7 +68,7 @@ export default function AgendamentosProfissional() {
 
         // Faz a requisição para obter as informações do usuário
         const response = await axios.get(
-          `https://mastriaagenda-production.up.railway.app/auth/me`,
+          `https://mastria-agenda.fly.dev/auth/me`,
           { headers }
         );
 

@@ -1,5 +1,5 @@
-import "../pages/styles/Login.css";
-import "../pages/styles/Global.css";
+import styles from "../pages/styles/Login.module.css"; // Importe o CSS Module
+import "../pages/styles/Global.css"; // Estilos globais (se necessário)
 import logo from "../pages/images/logo_maestria.png";
 
 import { useState } from "react";
@@ -19,7 +19,7 @@ export default function Login() {
     setError(null);
 
     try {
-      const response = await axios.post("https://mastriaagenda-production.up.railway.app/auth/login", {
+      const response = await axios.post("https://mastria-agenda.fly.dev/auth/login", {
         username,
         senha,
       });
@@ -29,7 +29,7 @@ export default function Login() {
         localStorage.setItem("token", token);
 
         // Busca informações do usuário autenticado
-        const userResponse = await axios.get("https://mastriaagenda-production.up.railway.app/auth/me", {
+        const userResponse = await axios.get("https://mastria-agenda.fly.dev/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -65,36 +65,37 @@ export default function Login() {
   };
 
   return (
-      <div className="container-login">
-        <div className="container-logo">
-          <img src={logo} alt="Logo Maestria" />
-          <div className="text-logo">
-            <h2>Agendamento Maestria</h2>
-          </div>
+    <div className={styles.containerLogin}>
+      <div className={styles.containerLogo}>
+        <img src={logo} alt="Logo Maestria" />
+        <div className={styles.textLogo}>
+          <h2>Agendamento Maestria</h2>
         </div>
-
-        <form onSubmit={handleLogin}>
-          <h2>SING IN</h2>
-          <input
-            type="text"
-            placeholder="Digite seu username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Digite sua senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Carregando..." : "Entrar"}
-          </button>
-          {error && <p className="erro-conexao">{error}</p>}
-        </form>
       </div>
+
+      <form onSubmit={handleLogin} className={styles.form}>
+        <h2>SING IN</h2>
+        <input
+          type="text"
+          placeholder="Digite seu username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Digite sua senha"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.button}
+        >
+          {loading ? "Carregando..." : "Entrar"}
+        </button>
+        {error && <p className={styles.erroConexao}>{error}</p>}
+      </form>
+    </div>
   );
 }

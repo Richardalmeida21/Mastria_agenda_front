@@ -1,5 +1,7 @@
 .dashboard-body {
   background-color: var(--black);
+  color: var(--gold);
+  font-family: 'Roboto', sans-serif;
 }
 
 .dashboard-container {
@@ -83,7 +85,6 @@
     justify-content: center;
     z-index: -99;
     position: absolute;
-<<<<<<< HEAD
     top: 74%;
   }
 
@@ -97,12 +98,11 @@
     padding: 1rem 2rem;
     border-radius: 1rem;
     color: var(--black);
-=======
+
     top: 70%;
   }
 
   .logo-dashboard {
     width: 12%;
     opacity: 0.6;
->>>>>>> 31d7ad2add65bb20d54d4a3c887525edbf6bc674
   }

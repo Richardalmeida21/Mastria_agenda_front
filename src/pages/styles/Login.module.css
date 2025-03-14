@@ -1,25 +1,18 @@
-/* Import Google Font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+/* Login.module.css */
 
-/* Global */
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #000;
-  color: var(--gold);
-}
-
-.container-login {
+.containerLogin {
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
   height: 100vh;
   gap: 2rem;
+  background-color: var(--black);
+  font-family: 'Roboto', sans-serif;
+  color: var(--gold);
 }
 
-.container-logo {
+.containerLogo {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,26 +20,26 @@ body {
   gap: 1rem;
 }
 
-.text-logo {
+.textLogo {
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 1.2rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
-.text-logo h2 {
-  font-size:1.8rem;
+.textLogo h2 {
+  font-size: 1.8rem;
   letter-spacing: 2px;
 }
 
-.container-logo img {
+.containerLogo img {
   width: 25%;
 }
 
-form {
+.form {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,31 +49,28 @@ form {
   color: white;
   padding: 1rem;
   width: 40%;
-  border-radius: .5rem;
-  box-shadow: 0 2px 6px var(--gold-transparent), 0 4px 18px var(--gold-transparent); /* Box-shadow discreto */
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px var(--gold-transparent), 0 4px 18px var(--gold-transparent);
 }
 
-input {
-  padding:1rem;
+.form input {
+  padding: 1rem;
   width: 90%;
   text-align: center;
   border: none;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   font-size: 1rem;
-}
-
-input {
   background-color: var(--gold-transparent);
   color: var(--white);
   border: 1px solid var(--white-transparent);
   border-radius: 2rem;
 }
 
-input::placeholder {
+.form input::placeholder {
   color: var(--white-transparent);
 }
 
-button {
+.button {
   background-color: var(--gold);
   color: var(--black);
   cursor: pointer;
@@ -91,50 +81,50 @@ button {
   border-radius: 2rem;
 }
 
-.erro-conexao {
-  padding: .5rem 1rem;
+.erroConexao {
+  padding: 0.5rem 1rem;
   background: white;
   color: var(--black);
   border-radius: 1rem;
   text-transform: capitalize;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 }
 
 /* Media Queries for Mobile Responsiveness */
 @media (max-width: 768px) {
-  .container-logo img {
+  .containerLogo img {
     width: 50%;
   }
 
-  form {
+  .form {
     width: 90%;
-    padding: .5rem;
+    padding: 0.5rem;
   }
 
-  button {
+  .button {
     width: 70%;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
   }
 }
 
 @media (max-width: 480px) {
-  .text-logo {
+  .textLogo {
     font-size: 1rem;
   }
 
-  .text-logo h2 {
+  .textLogo h2 {
     font-size: 1.5rem;
   }
 
-  .container-logo img {
+  .containerLogo img {
     width: 30%;
   }
 
-  form {
+  .form {
     width: 100%;
   }
 
-  button {
+  .button {
     width: 80%;
   }
 }
