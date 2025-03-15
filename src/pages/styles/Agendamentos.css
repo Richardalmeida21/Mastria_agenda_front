@@ -105,9 +105,12 @@
 }
 
 td.ocupado {
-  border: 1px solid var(--cor-ocupado);
+  color: var(--black);
 }
 
+td {
+  cursor: pointer;
+}
 
 
 /* Estilos gerais para o modal */
@@ -208,6 +211,7 @@ td.ocupado {
 .modal-botoes button[type="button"]:hover {
   background-color: #5a6268; /* Cinza mais escuro ao passar o mouse */
 }
+
 
 /* Estilos para responsividade */
 @media (max-width: 480px) {

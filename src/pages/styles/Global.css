@@ -5,11 +5,14 @@
 }
 
 :root {
-    --gold:#e1c340;
+    --gold:#b5a341;
+    --yellow: #e8d153;
+    --bege:#f1eab9;
+    --black: #000000;
     --gold-transparent:#e1c34063;
     --white-transparent:#ffffff8e;
-    --black:#000000;
+    --black-transparent:#000000e3;
     --white:#ffffff;
     --cor-disponivel:#28a745;
-    --cor-ocupado: #ff0019d8;
+    --cor-ocupado: #f82f43;
 }

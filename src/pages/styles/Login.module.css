@@ -1,15 +1,23 @@
 /* Login.module.css */
+body {
+  background-color: var(--gold-transparent);
+}
 
-.containerLogin {
+.containerLogin { 
   display: flex;
-  justify-content: center;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  height: 100vh;
-  gap: 2rem;
-  background-color: var(--black);
+  height: 80vh;
+  width: 70%;
+  background: var(--gold);
   font-family: 'Roboto', sans-serif;
-  color: var(--gold);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 1px solid var(--black);
+  border-radius: 2rem;
 }
 
 .containerLogo {
@@ -17,26 +25,30 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  color: var(--yellow);
+  background-color: var(--black-transparent);
+  gap: 3rem;
+  width: 50%; 
+  height: 120%; 
+  border-top-right-radius: 50%; 
+  border-bottom-right-radius: 50%; 
 }
 
 .textLogo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
   text-transform: uppercase;
-  gap: 0.5rem;
 }
 
 .textLogo h2 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   letter-spacing: 2px;
+  font-weight: bold;
 }
 
 .containerLogo img {
-  width: 25%;
+  width: 30%;
 }
 
 .form {
@@ -46,33 +58,38 @@
   gap: 1rem;
   text-align: center;
   text-transform: uppercase;
-  color: white;
+  color: var(--black);
   padding: 1rem;
-  width: 40%;
+  width: 50%;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 6px var(--gold-transparent), 0 4px 18px var(--gold-transparent);
 }
 
 .form input {
-  padding: 1rem;
-  width: 90%;
+  padding: 0.5rem;
+  width: 70%;
   text-align: center;
   border: none;
-  border-radius: 0.25rem;
+  border-bottom: 1px solid var(--black);
   font-size: 1rem;
-  background-color: var(--gold-transparent);
-  color: var(--white);
-  border: 1px solid var(--white-transparent);
-  border-radius: 2rem;
+  background-color: transparent;
+  color: var(--black);
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Adiciona uma transição suave */
+}
+
+.form input:focus {
+  border-bottom: 2px solid var(--gold); /* Altera a cor da borda ao focar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra ao focar */
 }
 
 .form input::placeholder {
-  color: var(--white-transparent);
+  color: var(--bege);
 }
 
 .button {
   background-color: var(--gold);
   color: var(--black);
+  border: 1px solid var(--black);
   cursor: pointer;
   text-transform: uppercase;
   margin-top: 1rem;

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../pages/styles/Agendamentos.css";
+import "../pages/styles/ModalMensagem.css";
+import ModalMensagem from "./ModalMensagem"; 
 
 export default function Agendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -11,34 +13,37 @@ export default function Agendamentos() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState(null);
   const [mostrarFormularioCadastro, setMostrarFormularioCadastro] = useState(false);
-  const [horarioSelecionado, setHorarioSelecionado] = useState(null);
-  const [profissionalSelecionado, setProfissionalSelecionado] = useState(null);
-  const [clienteSelecionado, setClienteSelecionado] = useState(null);
-  const [servicoSelecionado, setServicoSelecionado] = useState("");
-  const [observacao, setObservacao] = useState("");
-  const [duracao, setDuracao] = useState(30); // Duração padrão de 30 minutos
-  const [horariosOcupados, setHorariosOcupados] = useState({}); // Estado para horários ocupados
-  const [agendamentoDetalhes, setAgendamentoDetalhes] = useState(null); // Estado para o agendamento selecionado
-  const [modoEdicao, setModoEdicao] = useState(false); // Estado para controlar o modo de edição
+  const [agendamentoDetalhes, setAgendamentoDetalhes] = useState(null);
+  const [modoEdicao, setModoEdicao] = useState(false);
+  const [mostrarModalMensagem, setMostrarModalMensagem] = useState(false);
+  const [mensagemModal, setMensagemModal] = useState("");
+  const [tipoModal, setTipoModal] = useState("sucesso"); // "sucesso" ou "erro"
   const [novoAgendamento, setNovoAgendamento] = useState({
     clienteId: "",
     profissionalId: "",
     servico: "",
     data: dataSelecionada,
     hora: "",
-    duracao: 30,
+    duracao: 30, // Duração em minutos
     observacao: "",
   });
+
+  const [horariosOcupados, setHorariosOcupados] = useState({});
   const navigate = useNavigate();
 
-  const servicosDisponiveis = [
-    "MANICURE", "PEDICURE", "CABELO", "DEPILACAO", "PODOLOGIA"
-  ];
+  const servicosDisponiveis = ["MANICURE", "PEDICURE", "CABELO", "DEPILACAO", "PODOLOGIA"];
 
   // Função para formatar a duração (ex: "PT30M" -> "30 min")
   const formatarDuracao = (duracao) => {
     const minutos = duracao.replace("PT", "").replace("M", "");
     return `${minutos} min`;
+  };
+
+  // Função para exibir o modal de mensagem
+  const exibirModalMensagem = (mensagem, tipo) => {
+    setMensagemModal(mensagem);
+    setTipoModal(tipo);
+    setMostrarModalMensagem(true);
   };
 
   // Busca os dados dos agendamentos, profissionais e clientes
@@ -64,7 +69,7 @@ export default function Agendamentos() {
       setProfissionais(profissionaisRes.data);
       setClientes(clientesRes.data);
 
-      // Calcula os horários ocupados após carregar os agendamentos
+      // Calcula os horários ocupados
       const ocupados = calcularHorariosOcupados(agendamentosRes.data);
       setHorariosOcupados(ocupados);
     } catch (error) {
@@ -75,11 +80,6 @@ export default function Agendamentos() {
     }
   };
 
-  // Busca os dados ao carregar a página ou ao mudar a data selecionada
-  useEffect(() => {
-    buscarDados();
-  }, [dataSelecionada]);
-
   // Gera os horários disponíveis para agendamento
   const horarios = [];
   for (let h = 7; h < 20; h++) {
@@ -88,12 +88,12 @@ export default function Agendamentos() {
     }
   }
 
-  // Função para calcular os horários ocupados com base na duração
+  // Função para calcular os horários ocupados
   const calcularHorariosOcupados = (agendamentos) => {
     const ocupados = {};
 
     agendamentos.forEach((agendamento) => {
-      const horaInicio = agendamento.hora; // Formato "HH:MM:SS"
+      const horaInicio = agendamento.hora;
       const duracaoMinutos = parseInt(
         agendamento.duracao
           .replace("PT", "")
@@ -104,7 +104,7 @@ export default function Agendamentos() {
       );
 
       const [hora, minuto] = horaInicio.split(":").map(Number);
-      const inicioTotalMinutos = hora * 60 + minuto; // Converte horário para minutos
+      const inicioTotalMinutos = hora * 60 + minuto;
       const fimTotalMinutos = inicioTotalMinutos + duracaoMinutos;
 
       for (let minutos = inicioTotalMinutos; minutos <= fimTotalMinutos; minutos += 5) {
@@ -120,16 +120,21 @@ export default function Agendamentos() {
     return ocupados;
   };
 
+  // Busca os dados ao carregar a página ou ao mudar a data selecionada
+  useEffect(() => {
+    buscarDados();
+  }, [dataSelecionada]);
+
   // Função para exibir detalhes do agendamento
   const handleDetalhesAgendamento = (agendamento) => {
-    setAgendamentoDetalhes(agendamento); // Define o agendamento selecionado
-    setModoEdicao(false); // Reseta o modo de edição
+    setAgendamentoDetalhes(agendamento);
+    setModoEdicao(false);
   };
 
   // Função para fechar o modal de detalhes
   const handleFecharDetalhes = () => {
-    setAgendamentoDetalhes(null); // Fecha o modal
-    setModoEdicao(false); // Reseta o modo de edição
+    setAgendamentoDetalhes(null);
+    setModoEdicao(false);
   };
 
   // Função para excluir um agendamento
@@ -145,16 +150,16 @@ export default function Agendamentos() {
       await axios.delete(`https://mastria-agenda.fly.dev/agendamento/${id}`, { headers });
       buscarDados(); // Atualiza a lista de agendamentos
       handleFecharDetalhes(); // Fecha o modal
-      alert("Agendamento excluído com sucesso!");
+      exibirModalMensagem("Agendamento excluído com sucesso!", "sucesso");
     } catch (error) {
       console.error("Erro ao excluir agendamento", error);
-      alert("Erro ao excluir agendamento. Tente novamente.");
+      exibirModalMensagem("Erro ao excluir agendamento. Tente novamente.", "erro");
     }
   };
 
   // Função para entrar no modo de edição
   const handleEditarAgendamento = () => {
-    setModoEdicao(true); // Ativa o modo de edição
+    setModoEdicao(true);
   };
 
   // Função para salvar as alterações do agendamento
@@ -192,10 +197,10 @@ export default function Agendamentos() {
       console.log("Agendamento atualizado:", response.data);
       buscarDados(); // Atualiza a lista de agendamentos
       setModoEdicao(false); // Sai do modo de edição
-      alert("Agendamento atualizado com sucesso!");
+      exibirModalMensagem("Agendamento atualizado com sucesso!", "sucesso");
     } catch (error) {
       console.error("Erro ao atualizar agendamento", error);
-      alert("Erro ao atualizar agendamento. Tente novamente.");
+      exibirModalMensagem("Erro ao atualizar agendamento. Tente novamente.", "erro");
     }
   };
 
@@ -219,25 +224,35 @@ export default function Agendamentos() {
       return;
     }
 
+    // Verifica se o horário já está ocupado
+    const horarioOcupado = horariosOcupados[novoAgendamento.profissionalId]?.has(novoAgendamento.hora);
+    if (horarioOcupado) {
+      exibirModalMensagem("Erro: O horário selecionado já está ocupado.", "erro");
+      return;
+    }
+
     try {
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
 
+      // Converte a duração para o formato ISO 8601
+      const duracaoISO = `PT${novoAgendamento.duracao}M`;
+
       const response = await axios.post(
         "https://mastria-agenda.fly.dev/agendamento",
-        novoAgendamento,
+        { ...novoAgendamento, duracao: duracaoISO },
         { headers }
       );
 
       console.log("Agendamento cadastrado:", response.data);
       buscarDados(); // Atualiza a lista de agendamentos
       setMostrarFormularioCadastro(false); // Fecha o formulário
-      alert("Agendamento cadastrado com sucesso!");
+      exibirModalMensagem("Agendamento cadastrado com sucesso!", "sucesso");
     } catch (error) {
       console.error("Erro ao cadastrar agendamento", error);
-      alert("Erro ao cadastrar agendamento. Tente novamente.");
+      exibirModalMensagem("O horário selecionado já está ocupado.", "erro");
     }
   };
 
@@ -280,7 +295,7 @@ export default function Agendamentos() {
                 {profissionais.map((profissional) => {
                   const isOcupado = horariosOcupados[profissional.id]?.has(hora);
                   const agendamento = agendamentos.find((a) => {
-                    const horaInicio = a.hora; // Horário de início do agendamento
+                    const horaInicio = a.hora;
                     const duracaoMinutos = parseInt(
                       a.duracao
                         .replace("PT", "")
@@ -291,13 +306,12 @@ export default function Agendamentos() {
                     );
 
                     const [horaInicioH, horaInicioM] = horaInicio.split(":").map(Number);
-                    const inicioTotalMinutos = horaInicioH * 60 + horaInicioM; // Converte horário de início para minutos
-                    const fimTotalMinutos = inicioTotalMinutos + duracaoMinutos; // Calcula o horário de término
+                    const inicioTotalMinutos = horaInicioH * 60 + horaInicioM;
+                    const fimTotalMinutos = inicioTotalMinutos + duracaoMinutos;
 
                     const [horaAtualH, horaAtualM] = hora.split(":").map(Number);
-                    const horaAtualTotalMinutos = horaAtualH * 60 + horaAtualM; // Converte horário clicado para minutos
+                    const horaAtualTotalMinutos = horaAtualH * 60 + horaAtualM;
 
-                    // Verifica se o horário clicado está dentro do intervalo do agendamento
                     return (
                       a.profissional.id === profissional.id &&
                       horaAtualTotalMinutos >= inicioTotalMinutos &&
@@ -305,7 +319,6 @@ export default function Agendamentos() {
                     );
                   });
 
-                  // Verifica se a célula atual é a primeira do agendamento (horário de início)
                   const isPrimeiraCelula = agendamento?.hora === hora;
 
                   return (
@@ -314,17 +327,17 @@ export default function Agendamentos() {
                       className={`${isOcupado ? "ocupado" : "available"}`}
                       onClick={() => {
                         if (isOcupado && agendamento) {
-                          handleDetalhesAgendamento(agendamento); // Abre o modal de detalhes
+                          handleDetalhesAgendamento(agendamento);
                         } else if (!isOcupado) {
-                          handleSelecionarHorario(hora, profissional); // Abre o formulário de cadastro
+                          handleSelecionarHorario(hora, profissional);
                         }
                       }}
                     >
                       {isPrimeiraCelula
-                        ? `${agendamento.cliente.nome} - ${agendamento.servico}` // Exibe nome e serviço apenas na primeira célula
+                        ? `${agendamento.cliente.nome} - ${agendamento.servico}`
                         : isOcupado
-                        ? "" // Células ocupadas (não início) ficam vazias
-                        : "Disponível"} {/* Células disponíveis exibem "Disponível" */}
+                        ? ""
+                        : "Disponível"}
                     </td>
                   );
                 })}
@@ -492,6 +505,15 @@ export default function Agendamentos() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Modal de Mensagem */}
+      {mostrarModalMensagem && (
+        <ModalMensagem
+          mensagem={mensagemModal}
+          tipo={tipoModal}
+          onFechar={() => setMostrarModalMensagem(false)}
+        />
       )}
     </div>
   );

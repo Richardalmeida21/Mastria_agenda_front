@@ -88,6 +88,7 @@ export default function Clientes() {
       {loading && <p>Carregando...</p>}
 
       <form onSubmit={criarCliente} className="form-clientes">
+        <h2>Preencha os dados do cliente</h2>
         <input
           type="text"
           placeholder="Nome"
@@ -154,7 +155,7 @@ export default function Clientes() {
                   cliente.telefone
                 )}
               </td>
-              <td>
+              <td className="btn-tabela-clientes">
                 {clienteEditandoId === cliente.id ? (
                   <button onClick={() => atualizarCliente(cliente.id)}>Salvar</button>
                 ) : (

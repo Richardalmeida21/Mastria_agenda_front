@@ -65,37 +65,36 @@ export default function Login() {
   };
 
   return (
-    <div className={styles.containerLogin}>
-      <div className={styles.containerLogo}>
-        <img src={logo} alt="Logo Maestria" />
-        <div className={styles.textLogo}>
-          <h2>Agendamento Maestria</h2>
+      <div className={styles.containerLogin}>
+        <div className={styles.containerLogo}>
+          <img src={logo} alt="Logo Maestria" />
+          <div className={styles.textLogo}>
+            <h2>Welcome back!</h2>
+          </div>
         </div>
+        <form onSubmit={handleLogin} className={styles.form}>
+          <h2>SING IN</h2>
+          <input
+            type="text"
+            placeholder="Digite seu username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Digite sua senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className={styles.button}
+          >
+            {loading ? "Carregando..." : "Entrar"}
+          </button>
+          {error && <p className={styles.erroConexao}>{error}</p>}
+        </form>
       </div>
-
-      <form onSubmit={handleLogin} className={styles.form}>
-        <h2>SING IN</h2>
-        <input
-          type="text"
-          placeholder="Digite seu username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Digite sua senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className={styles.button}
-        >
-          {loading ? "Carregando..." : "Entrar"}
-        </button>
-        {error && <p className={styles.erroConexao}>{error}</p>}
-      </form>
-    </div>
   );
 }
